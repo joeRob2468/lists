@@ -1,0 +1,82 @@
+# ----------------------
+# Dependencies & Logs
+# ----------------------
+node_modules
+.pnpm-store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# ----------------------
+# Build Outputs (Global)
+# ----------------------
+# Ignores 'dist' folder in apps/api, apps/web, packages/common, etc.
+dist
+build
+out
+coverage
+
+# ----------------------
+# Monorepo / Turbo
+# ----------------------
+.turbo
+
+# ----------------------
+# TypeScript
+# ----------------------
+# Important for monorepos using references or incremental builds
+*.tsbuildinfo
+
+# ----------------------
+# Environment Variables
+# ----------------------
+# Ignore all .env files
+.env
+.env.*
+# But allow checking in example files
+!.env.example
+!.env.test.example
+
+# ----------------------
+# IDEs & Editors
+# ----------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea
+*.swp
+*.swo
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# ----------------------
+# ESLint
+# ----------------------
+.eslintcache
+
+# ----------------------
+# Testing (Future-proofing)
+# ----------------------
+# Playwright/Cypress results (common for web apps)
+test-results/
+playwright-report/
+cypress/videos/
+cypress/screenshots/
+
+# ----------------------
+# Local Development Certificates
+# ----------------------
+*.pem
+*.crt
+
+# ----------------------
+# Husky
+# ----------------------
+# Ignore the internal binary, keep the config
+.husky/_

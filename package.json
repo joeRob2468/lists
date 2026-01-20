@@ -1,0 +1,42 @@
+{
+  "name": "shopping-list",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "zod": "^4.3.5"
+    }
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "commit": "cz",
+    "prepare": "husky"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
+    "@commitlint/types": "^20.3.1",
+    "@eslint/js": "^9.39.2",
+    "commitizen": "^4.3.1",
+    "cz-git": "^1.12.0",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "prettier": "^3.8.0",
+    "turbo": "^2.7.5",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.53.1"
+  }
+}

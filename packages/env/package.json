@@ -1,0 +1,17 @@
+{
+  "name": "@repo/env",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "sideEffects": false,
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "typescript": "^5.x.x"
+  },
+  "dependencies": {
+    "@t3-oss/env-core": "^0.13.10",
+    "zod": "^4.3.5"
+  }
+}
