@@ -80,3 +80,8 @@ cypress/screenshots/
 # ----------------------
 # Ignore the internal binary, keep the config
 .husky/_
+
+# ----------------------
+# Internal notes/docs
+# ----------------------
+docs
