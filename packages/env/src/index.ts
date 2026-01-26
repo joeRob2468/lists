@@ -6,8 +6,8 @@ export const env = createEnv({
     // Server-side env variables (api only)
     API_PORT: z.coerce.number().default(3001),
     APP_PORT: z.coerce.number().default(3000),
+    APP_URL: z.url(),
     DATABASE_URL: z.url(),
-    API_SECRET: z.string().min(1),
   },
   clientPrefix: 'VITE_',
   client: {
