@@ -1,14 +1,14 @@
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { OAuth2Namespace } from "@fastify/oauth2";
-import { JWT } from "@fastify/jwt";
-import * as schema from "@/db/schema";
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { OAuth2Namespace } from '@fastify/oauth2';
+import { JWT } from '@fastify/jwt';
+import * as schema from '@/db/schema';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
     user: {
       id: string;
       email: string;
-    }
+    };
   }
 }
 

@@ -10,7 +10,7 @@ export default fp(async (fastify) => {
         error: error.error,
         message: error.message,
         statusCode: error.statusCode,
-        details: error.details
+        details: error.details,
       });
     }
 
@@ -19,7 +19,7 @@ export default fp(async (fastify) => {
         error: 'BAD_REQUEST',
         message: 'Validation failed',
         statusCode: 400,
-        details: error.issues
+        details: error.issues,
       });
     }
 
@@ -29,7 +29,7 @@ export default fp(async (fastify) => {
     return reply.status(statusCode).send({
       error: statusCode === 500 ? 'INTERNAL_SERVER_ERROR' : error.name,
       message: error.message || 'An unexpected error occurred',
-      statusCode
+      statusCode,
     });
   });
 });

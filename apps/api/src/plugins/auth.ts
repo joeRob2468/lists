@@ -6,12 +6,12 @@ import { env } from '@repo/env';
 
 export default fp(async (app) => {
   await app.register(cookie);
-  
+
   await app.register(jwt, {
     secret: env.AUTH_SECRET,
     cookie: {
       cookieName: 'session',
-      signed: false, 
+      signed: false,
     },
   });
 
@@ -30,8 +30,8 @@ export default fp(async (app) => {
       path: '/',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // don't enforce secure cookies in local dev
-      sameSite: 'lax'
-    } 
+      sameSite: 'lax',
+    },
   });
 
   app.decorate('authenticate', async (req, res) => {

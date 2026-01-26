@@ -1,6 +1,6 @@
-import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { ApiError, ApiErrorResponseSchema, User, UserSchema } from "@repo/common";
-import z from "zod";
+import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+import { ApiError, ApiErrorResponseSchema, UserSchema } from '@repo/common';
+import z from 'zod';
 
 export const userModule: FastifyPluginAsyncZod = async (app) => {
   app.route({
@@ -12,21 +12,21 @@ export const userModule: FastifyPluginAsyncZod = async (app) => {
       summary: 'Get current user',
       response: {
         200: UserSchema,
-        401: ApiErrorResponseSchema
-      }
-    }, 
+        401: ApiErrorResponseSchema,
+      },
+    },
     handler: async (req, res) => {
       const user = await app.db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.id, req.user.id)
+        where: (users, { eq }) => eq(users.id, req.user.id),
       });
 
       if (!user) {
         res.clearCookie('session');
-        throw new ApiError(401, "UNAUTHORIZED", "User not found");
+        throw new ApiError(401, 'UNAUTHORIZED', 'User not found');
       }
 
       return user;
-    }
+    },
   });
 
   app.route({
@@ -37,19 +37,19 @@ export const userModule: FastifyPluginAsyncZod = async (app) => {
       description: 'Returns a static user for demonstration',
       tags: ['User'],
       params: z.object({
-        id: z.uuid()
+        id: z.uuid(),
       }),
       response: {
         200: UserSchema,
         400: ApiErrorResponseSchema,
-        404: ApiErrorResponseSchema
+        404: ApiErrorResponseSchema,
       },
     },
     handler: async (req) => {
       const { id } = req.params;
-      
+
       const user = await app.db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.id, id)
+        where: (users, { eq }) => eq(users.id, id),
       });
 
       if (!user) {

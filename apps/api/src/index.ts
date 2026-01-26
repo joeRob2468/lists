@@ -8,7 +8,7 @@ import {
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
 import { env } from '@repo/env';
-import drizzlePlugin from "@/plugins/drizzle";
+import drizzlePlugin from '@/plugins/drizzle';
 import authPlugin from '@/plugins/auth';
 import errorHandlerPlugin from '@/plugins/error-handler';
 import corsPlugin from '@/plugins/cors';
@@ -42,7 +42,7 @@ const start = async () => {
     await app.register(swaggerUi, {
       routePrefix: '/docs',
     });
-    
+
     await app.register(errorHandlerPlugin);
     await app.register(corsPlugin);
     await app.register(helmetPlugin);

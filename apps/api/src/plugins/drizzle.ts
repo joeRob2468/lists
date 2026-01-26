@@ -1,8 +1,8 @@
 import fp from 'fastify-plugin';
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "@/db/schema";
-import { env } from "@repo/env";
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import * as schema from '@/db/schema';
+import { env } from '@repo/env';
 
 export default fp(async (fastify) => {
   const queryClient = postgres(env.DATABASE_URL);
@@ -12,4 +12,4 @@ export default fp(async (fastify) => {
   fastify.addHook('onClose', async () => {
     await queryClient.end();
   });
-})
+});
