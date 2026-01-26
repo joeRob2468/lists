@@ -8,9 +8,11 @@ import {
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
 import { env } from '@repo/env';
-import drizzle from "@/plugins/drizzle";
-import errorHandler from '@/plugins/error-handler';
+import drizzlePlugin from "@/plugins/drizzle";
+import authPlugin from '@/plugins/auth';
+import errorHandlerPlugin from '@/plugins/error-handler';
 import { userModule } from '@/modules/user/user.routes';
+import { authModule } from '@/modules/auth/auth.routes';
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 app.setValidatorCompiler(validatorCompiler);
@@ -18,8 +20,7 @@ app.setSerializerCompiler(serializerCompiler);
 
 const start = async () => {
   try {
-    await app.register(errorHandler);
-    await app.register(drizzle);
+    await app.register(drizzlePlugin);
     await app.register(swagger, {
       openapi: {
         info: {
@@ -39,7 +40,11 @@ const start = async () => {
     await app.register(swaggerUi, {
       routePrefix: '/docs',
     });
+    
+    await app.register(errorHandlerPlugin);
+    await app.register(authPlugin);
 
+    await app.register(authModule, { prefix: '/auth' });
     await app.register(userModule, { prefix: '/user' });
 
     await app.listen({ port: env.API_PORT });

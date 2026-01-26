@@ -8,6 +8,10 @@ export const env = createEnv({
     APP_PORT: z.coerce.number().default(3000),
     APP_URL: z.url(),
     DATABASE_URL: z.url(),
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
+    AUTH_SECRET: z.string().min(32),
+    ALLOWED_ORIGINS: z.string().transform(s => s.split(','))
   },
   clientPrefix: 'VITE_',
   client: {
