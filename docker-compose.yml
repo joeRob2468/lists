@@ -1,0 +1,24 @@
+services:
+  # The Database
+  db:
+    image: postgres:16-alpine
+    container_name: shopping_list_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shopping_list
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Mailpit - Catches emails sent by API during dev (auth emails, invites).
+  mailpit:
+    image: axllent/mailpit
+    container_name: shopping_list_mail
+    ports:
+      - "8025:8025" # UI
+      - "1025:1025" # SMTP Port
+
+volumes:
+  postgres_data:

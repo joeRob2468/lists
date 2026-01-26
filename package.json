@@ -19,7 +19,10 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "commit": "cz",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:generate": "pnpm --filter api db:generate",
+    "db:migrate": "pnpm --filter api db:migrate",
+    "db:studio": "pnpm --filter api db:studio"
   },
   "packageManager": "pnpm@10.28.1",
   "devDependencies": {
