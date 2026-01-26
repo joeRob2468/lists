@@ -16,7 +16,7 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
       })
     },
     handler: async (req, res) => {
-      const redirectUrl = req.query.redirect || env.VITE_API_URL;
+      const redirectUrl = req.query.redirect || env.APP_URL;
       
       const url = new URL(redirectUrl);
       if (!env.ALLOWED_ORIGINS.includes(url.origin)) {
@@ -42,7 +42,7 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
   app.route({
     method: 'GET',
     url: '/callback/google',
-    schema: { querystring: z.object({ state: z.string().optional() }).passthrough() },
+    schema: { querystring: z.looseObject({ state: z.string().optional() }) },
     handler: async (req, res) => {
       // Library validates state (CSRF) automatically here
       const { token } = await app.google.getAccessTokenFromAuthorizationCodeFlow(req);
@@ -72,7 +72,7 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
       });
 
       // Retrieve and clear the return_url cookie
-      const returnUrl = req.cookies.return_url || env.VITE_API_URL;
+      const returnUrl = req.cookies.return_url || env.APP_URL;
       res.clearCookie('return_url');
 
       return res.redirect(returnUrl);
