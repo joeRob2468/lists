@@ -40,7 +40,7 @@ const start = async () => {
       routePrefix: '/docs',
     });
 
-    await app.register(userModule);
+    await app.register(userModule, { prefix: '/user' });
 
     await app.listen({ port: env.API_PORT });
   } catch (err) {

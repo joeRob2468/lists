@@ -1,23 +1,26 @@
 import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import fp from 'fastify-plugin';
 import { ApiError, ApiErrorResponseSchema, User, UserSchema } from "@repo/common";
+import z from "zod";
 
-export const userModule: FastifyPluginAsyncZod = fp(async (app) => {
+export const userModule: FastifyPluginAsyncZod = async (app) => {
   app.route({
     method: 'GET',
-    url: '/user/:id',
+    url: '/:id',
     schema: {
       summary: 'Get User',
       description: 'Returns a static user for demonstration',
       tags: ['User'],
+      params: z.object({
+        id: z.uuid()
+      }),
       response: {
         200: UserSchema,
         400: ApiErrorResponseSchema,
         404: ApiErrorResponseSchema
       },
     },
-    handler: async function multi(req, res) {
-      const { id } = req.params as { id: string };
+    handler: async (req, res) => {
+      const { id } = req.params;
       
       // const user = await app.db.query.users.findFirst({
       //   where: (users, { eq }) => eq(users.id, id)
@@ -37,4 +40,4 @@ export const userModule: FastifyPluginAsyncZod = fp(async (app) => {
       return user;
     },
   });
-});
+};
