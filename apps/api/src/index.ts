@@ -11,6 +11,8 @@ import { env } from '@repo/env';
 import drizzlePlugin from "@/plugins/drizzle";
 import authPlugin from '@/plugins/auth';
 import errorHandlerPlugin from '@/plugins/error-handler';
+import corsPlugin from '@/plugins/cors';
+import helmetPlugin from '@/plugins/helmet';
 import { userModule } from '@/modules/user/user.routes';
 import { authModule } from '@/modules/auth/auth.routes';
 
@@ -42,6 +44,8 @@ const start = async () => {
     });
     
     await app.register(errorHandlerPlugin);
+    await app.register(corsPlugin);
+    await app.register(helmetPlugin);
     await app.register(authPlugin);
 
     await app.register(authModule, { prefix: '/auth' });
