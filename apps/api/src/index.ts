@@ -8,7 +8,8 @@ import {
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
 import { env } from '@repo/env';
-import { User, UserSchema } from '@repo/common';
+import drizzle from "@/plugins/drizzle";
+import errorHandler from '@/plugins/error-handler';
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 app.setValidatorCompiler(validatorCompiler);
@@ -16,6 +17,7 @@ app.setSerializerCompiler(serializerCompiler);
 
 const start = async () => {
   try {
+    await app.register(drizzle);
     await app.register(swagger, {
       openapi: {
         info: {
@@ -32,35 +34,12 @@ const start = async () => {
       },
       transform: jsonSchemaTransform,
     });
-
     await app.register(swaggerUi, {
       routePrefix: '/docs',
     });
-
-    app.route({
-      method: 'GET',
-      url: '/',
-      schema: {
-        summary: 'Get User',
-        description: 'Returns a static user for demonstration',
-        tags: ['User'],
-        response: {
-          200: UserSchema,
-        },
-      },
-      handler: (req, res) => {
-        const user: User = {
-          id: '1',
-          name: 'John Darksouls',
-        };
-        return user;
-      },
-    });
+    await app.register(errorHandler);
 
     await app.listen({ port: env.API_PORT });
-    console.log(
-      `Swagger docs available at http://localhost:${env.API_PORT}/docs`,
-    );
   } catch (err) {
     app.log.error(err);
     process.exit(1);
