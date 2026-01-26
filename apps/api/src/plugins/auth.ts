@@ -25,8 +25,13 @@ export default fp(async (app) => {
       auth: oauth2.GOOGLE_CONFIGURATION,
     },
     scope: ['profile', 'email'],
-    // startRedirectPath is REMOVED to allow custom handling in auth.routes.ts
-    callbackUri: `${env.VITE_API_URL}/auth/callback/google`, 
+    callbackUri: `${env.VITE_API_URL}/auth/callback/google`,
+    cookie: {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // don't enforce secure cookies in local dev
+      sameSite: 'lax'
+    } 
   });
 
   app.decorate('authenticate', async (req, res) => {
