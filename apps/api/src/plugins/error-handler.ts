@@ -3,8 +3,8 @@ import { ZodError } from 'zod';
 import fp from 'fastify-plugin';
 import { FastifyError } from 'fastify';
 
-export default fp(async (fastify) => {
-  fastify.setErrorHandler((error: FastifyError, request, reply) => {
+export default fp(async (app) => {
+  app.setErrorHandler((error: FastifyError, request, reply) => {
     if (error instanceof ApiError) {
       return reply.status(error.statusCode).send({
         error: error.error,
@@ -24,7 +24,7 @@ export default fp(async (fastify) => {
     }
 
     const statusCode = error.statusCode ?? 500;
-    fastify.log.error(error);
+    app.log.error(error);
 
     return reply.status(statusCode).send({
       error: statusCode === 500 ? 'INTERNAL_SERVER_ERROR' : error.name,

@@ -4,12 +4,12 @@ import postgres from 'postgres';
 import * as schema from '@/db/schema';
 import { env } from '@repo/env';
 
-export default fp(async (fastify) => {
+export default fp(async (app) => {
   const queryClient = postgres(env.DATABASE_URL);
   const db = drizzle(queryClient, { schema });
 
-  fastify.decorate('db', db);
-  fastify.addHook('onClose', async () => {
+  app.decorate('db', db);
+  app.addHook('onClose', async () => {
     await queryClient.end();
   });
 });

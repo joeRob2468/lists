@@ -5,13 +5,12 @@ import { users } from '@/db/schema';
 import { ApiError } from '@repo/common';
 
 export const authModule: FastifyPluginAsyncZod = async (app) => {
-  // 1. Trigger Login
   app.route({
     method: 'GET',
     url: '/login/google',
     schema: {
       querystring: z.object({
-        redirect: z.string().url().optional(),
+        redirect: z.url().optional(),
       }),
     },
     handler: async (req, res) => {
@@ -22,7 +21,7 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
         throw new ApiError(400, 'INVALID_REDIRECT', 'Redirect URL not allowed');
       }
 
-      // Store redirect URL in a cookie instead of OAuth state
+      // Store redirect URL in a cookie
       res.setCookie('return_url', redirectUrl, {
         path: '/',
         httpOnly: true,
@@ -40,13 +39,11 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
     },
   });
 
-  // 2. Callback
   app.route({
     method: 'GET',
     url: '/callback/google',
     schema: { querystring: z.looseObject({ state: z.string().optional() }) },
     handler: async (req, res) => {
-      // Library validates state (CSRF) automatically here
       const { token } =
         await app.google.getAccessTokenFromAuthorizationCodeFlow(req);
 
