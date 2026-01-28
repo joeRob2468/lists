@@ -124,7 +124,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       summary: 'Create a new list from an existing template',
       body: CreateShoppingListFromTemplateSchema,
       response: {
-        201: ShoppingListSchema,
+        201: ShoppingListWithItemsSchema,
         404: ApiErrorResponseSchema,
       },
     },
@@ -165,8 +165,13 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         );
       }
 
+      const fullList = await app.db.query.shoppingLists.findFirst({
+        where: eq(shoppingLists.id, newList.id),
+        with: { items: { orderBy: asc(shoppingItems.position) } },
+      });
+
       res.status(201);
-      return newList;
+      return fullList;
     },
   });
 
