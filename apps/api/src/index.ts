@@ -15,6 +15,7 @@ import corsPlugin from '@/plugins/cors';
 import helmetPlugin from '@/plugins/helmet';
 import { userModule } from '@/modules/user/user.routes';
 import { authModule } from '@/modules/auth/auth.routes';
+import { listModule } from '@/modules/list/list.routes';
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 app.setValidatorCompiler(validatorCompiler);
@@ -50,6 +51,7 @@ const start = async () => {
 
     await app.register(authModule, { prefix: '/auth' });
     await app.register(userModule, { prefix: '/user' });
+    await app.register(listModule, { prefix: '/lists' });
 
     await app.listen({ port: env.API_PORT });
   } catch (err) {
