@@ -18,6 +18,16 @@ export const env = createEnv({
     // client side variables (web and api)
     VITE_API_URL: z.url(),
   },
-  runtimeEnv: process.env,
+  runtimeEnv: {
+    API_PORT: process.env.API_PORT,
+    APP_PORT: process.env.APP_PORT,
+    APP_URL: process.env.APP_URL,
+    DATABASE_URL: process.env.DATABASE_URL,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    AUTH_SECRET: process.env.AUTH_SECRET,
+    ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
+    VITE_API_URL: process.env.VITE_API_URL,
+  },
   emptyStringAsUndefined: true,
 });

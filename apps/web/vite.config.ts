@@ -8,11 +8,23 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
+     define: {
+      'process.env': Object.keys(env).reduce((acc, key) => {
+        if (key.startsWith('VITE_') || key === 'NODE_ENV') {
+          acc[key] = env[key];
+        }
+        return acc;
+      }, {} as Record<string, string>),
+    },
     envDir,
     server: {
       port: parseInt(env.APP_PORT || '3000'),
     },
-    // Ensure Vite optimizes the linked package
     optimizeDeps: {
       include: ['@repo/common', '@repo/env'],
     },
