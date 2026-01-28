@@ -9,6 +9,7 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
     method: 'GET',
     url: '/login/google',
     schema: {
+      tags: ['OAuth2'],
       querystring: z.object({
         redirect: z.url().optional(),
       }),
@@ -42,7 +43,10 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
   app.route({
     method: 'GET',
     url: '/callback/google',
-    schema: { querystring: z.looseObject({ state: z.string().optional() }) },
+    schema: {
+      tags: ['OAuth2'],
+      querystring: z.looseObject({ state: z.string().optional() }),
+    },
     handler: async (req, res) => {
       const { token } =
         await app.google.getAccessTokenFromAuthorizationCodeFlow(req);
