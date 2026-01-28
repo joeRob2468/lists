@@ -1,57 +1,27 @@
-import { useState } from 'react';
-import './App.css';
-import type { User } from '@repo/common';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { AppProvider } from '@/providers/app-provider';
+import { ProtectedRoute } from '@/modules/auth/components/protected-route';
+import { LandingPage } from '@/modules/landing/pages/landing-page';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const Dashboard = () => <h1>Dashboard</h1>;
+const ListDetail = () => <h1>List Detail</h1>;
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
-
-  const login = () => {
-    window.location.href = `${API_URL}/auth/login/google?redirect=${window.location.origin}`;
-  };
-
-  const checkUser = async () => {
-    try {
-      const res = await fetch(`${API_URL}/user/me`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (res.ok) {
-        setUser(await res.json());
-      } else {
-        alert('Not logged in');
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   return (
-    <>
-      <div style={{ padding: '2rem' }}>
-        <h1>OAuth Test</h1>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button onClick={login}>Log in with Google</button>
-          <button onClick={checkUser}>Check auth (/user/me)</button>
-        </div>
+    <AppProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
 
-        {user && (
-          <pre
-            style={{
-              marginTop: '1rem',
-              background: '#f0f0f0',
-              padding: '1rem',
-              color: '#111111',
-              textAlign: 'left',
-            }}
-          >
-            {JSON.stringify(user, null, 2)}
-          </pre>
-        )}
-      </div>
-    </>
+          {/* Private Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/lists/:listId" element={<ListDetail />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AppProvider>
   );
 }
 
