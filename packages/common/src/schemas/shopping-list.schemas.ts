@@ -26,6 +26,10 @@ export const UpdateShoppingItemSchema = ShoppingItemSchema.partial().pick({
   position: true,
 });
 
+export const ReorderShoppingItemsSchema = z.object({
+  itemIds: z.array(z.uuid()).min(1),
+});
+
 export const ShoppingListSchema = z.object({
   id: z.uuid(),
   ownerId: z.uuid(),

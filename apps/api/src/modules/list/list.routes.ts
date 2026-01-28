@@ -12,6 +12,7 @@ import {
   UpdateShoppingItemSchema,
   UpdateShoppingListSchema,
   ShoppingItemSchema,
+  ReorderShoppingItemsSchema,
 } from '@repo/common';
 import { shoppingItems, shoppingLists } from '@/db/schema';
 
@@ -315,6 +316,59 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       }
 
       return updated;
+    },
+  });
+
+  app.route({
+    method: 'PATCH',
+    url: '/:id/items/reorder',
+    onRequest: [app.authenticate],
+    schema: {
+      tags: ['Items'],
+      summary: 'Reorder items',
+      params: z.object({ id: z.uuid() }),
+      body: ReorderShoppingItemsSchema,
+      response: {
+        200: z.array(ShoppingItemSchema),
+      },
+    },
+    handler: async (req, res) => {
+      const { itemIds } = req.body;
+      const listId = req.params.id;
+
+      const list = await app.db.query.shoppingLists.findFirst({
+        where: and(
+          eq(shoppingLists.id, listId),
+          eq(shoppingLists.ownerId, req.user.id),
+        ),
+      });
+
+      if (!list) {
+        throw new ApiError(404, 'NOT_FOUND', 'List not found');
+      }
+
+      await app.db.transaction(async (tx) => {
+        await Promise.all(
+          itemIds.map((itemId, index) =>
+            tx
+              .update(shoppingItems)
+              .set({ position: index })
+              .where(
+                and(
+                  eq(shoppingItems.id, itemId),
+                  eq(shoppingItems.listId, listId),
+                ),
+              ),
+          ),
+        );
+      });
+
+      const updatedItems = await app.db.query.shoppingItems.findMany({
+        where: eq(shoppingItems.listId, listId),
+        orderBy: asc(shoppingItems.position),
+      });
+
+      return updatedItems;
     },
   });
 
