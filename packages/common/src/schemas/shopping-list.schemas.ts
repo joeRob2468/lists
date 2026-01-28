@@ -30,8 +30,8 @@ export const ShoppingListSchema = z.object({
   id: z.uuid(),
   ownerId: z.uuid(),
   name: z.string().min(1),
-  isTemplate: z.boolean(),
-  isShared: z.boolean(),
+  isTemplate: z.boolean().default(false),
+  isShared: z.boolean().default(false),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
