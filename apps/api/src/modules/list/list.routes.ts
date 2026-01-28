@@ -347,7 +347,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         200: z.array(ShoppingItemSchema),
       },
     },
-    handler: async (req, res) => {
+    handler: async (req) => {
       const { itemIds } = req.body;
       const listId = req.params.id;
 
