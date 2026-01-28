@@ -280,6 +280,11 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         })
         .returning();
 
+      await app.db
+        .update(shoppingLists)
+        .set({ updatedAt: new Date() })
+        .where(eq(shoppingLists.id, list.id));
+
       res.status(201);
       return item;
     },
@@ -319,6 +324,11 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       if (!updated) {
         throw new ApiError(404, 'NOT_FOUND', 'Item or List not found');
       }
+
+      await app.db
+        .update(shoppingLists)
+        .set({ updatedAt: new Date() })
+        .where(eq(shoppingLists.id, req.params.id));
 
       return updated;
     },
@@ -368,6 +378,11 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         );
       });
 
+      await app.db
+        .update(shoppingLists)
+        .set({ updatedAt: new Date() })
+        .where(eq(shoppingLists.id, list.id));
+
       const updatedItems = await app.db.query.shoppingItems.findMany({
         where: eq(shoppingItems.listId, listId),
         orderBy: asc(shoppingItems.position),
@@ -409,6 +424,11 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       if (result.length === 0) {
         throw new ApiError(404, 'NOT_FOUND', 'Item not found');
       }
+
+      await app.db
+        .update(shoppingLists)
+        .set({ updatedAt: new Date() })
+        .where(eq(shoppingLists.id, req.params.id));
 
       res.status(204).send(null);
     },
