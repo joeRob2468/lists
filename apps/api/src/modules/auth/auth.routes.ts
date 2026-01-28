@@ -11,11 +11,11 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
     schema: {
       tags: ['OAuth2'],
       querystring: z.object({
-        redirect: z.url().optional(),
+        return_url: z.url().optional(),
       }),
     },
     handler: async (req, res) => {
-      const redirectUrl = req.query.redirect || env.APP_URL;
+      const redirectUrl = req.query.return_url || env.APP_URL;
 
       const url = new URL(redirectUrl);
       if (!env.ALLOWED_ORIGINS.includes(url.origin)) {
