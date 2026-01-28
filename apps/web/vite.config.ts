@@ -13,13 +13,16 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
-     define: {
-      'process.env': Object.keys(env).reduce((acc, key) => {
-        if (key.startsWith('VITE_') || key === 'NODE_ENV') {
-          acc[key] = env[key];
-        }
-        return acc;
-      }, {} as Record<string, string>),
+    define: {
+      'process.env': Object.keys(env).reduce(
+        (acc, key) => {
+          if (key.startsWith('VITE_') || key === 'NODE_ENV') {
+            acc[key] = env[key];
+          }
+          return acc;
+        },
+        {} as Record<string, string>,
+      ),
     },
     envDir,
     server: {

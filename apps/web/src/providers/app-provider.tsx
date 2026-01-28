@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <MantineProvider theme={theme} defaultColorScheme='dark'>
+    <MantineProvider theme={theme} defaultColorScheme="dark">
       <QueryClientProvider client={queryClient}>
         {children}
         <ReactQueryDevtools initialIsOpen={false} />

@@ -9,16 +9,21 @@ export const LandingPage = () => {
   };
 
   return (
-    <Container size="md" h="100vh" display="flex" style={{ alignItems: 'center', justifyContent: 'center' }}>
+    <Container
+      size="md"
+      h="100vh"
+      display="flex"
+      style={{ alignItems: 'center', justifyContent: 'center' }}
+    >
       <Stack gap={30} align="center" ta="center">
-        
         <Title order={1} style={{ fontSize: rem(48) }}>
           Shopping Lists.
         </Title>
 
         <Text c="dimmed" size="lg" maw={580}>
-          A simple, collaborative shopping list app. Create templates, share with family, 
-          and check off items in real-time. No clutter, just groceries.
+          A simple, collaborative shopping list app. Create templates, share
+          with family, and check off items in real-time. No clutter, just
+          groceries.
         </Text>
 
         <Button
@@ -30,7 +35,6 @@ export const LandingPage = () => {
         >
           Continue with Google
         </Button>
-        
       </Stack>
     </Container>
   );
