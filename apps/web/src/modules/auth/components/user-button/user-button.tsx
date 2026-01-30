@@ -49,7 +49,7 @@ export const UserButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await apiClient.post('auth/logout');
+    await apiClient.post('auth/logout', { json: {} });
     queryClient.clear();
     navigate('/');
   };
