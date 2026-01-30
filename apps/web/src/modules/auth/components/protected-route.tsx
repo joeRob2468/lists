@@ -1,4 +1,4 @@
-import { Center, Loader } from '@mantine/core';
+import { LoadingOverlay } from '@mantine/core';
 import { useUser } from '../hooks/use-user';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -6,11 +6,7 @@ export const ProtectedRoute = () => {
   const { data: user, isLoading, isError } = useUser();
 
   if (isLoading) {
-    return (
-      <Center h="100vh">
-        <Loader size="xl" />
-      </Center>
-    );
+    return <LoadingOverlay overlayProps={{ radius: 'sm', blur: 2 }} visible />;
   }
 
   if (isError || !user) {

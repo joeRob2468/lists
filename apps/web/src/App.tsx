@@ -1,10 +1,10 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AppProvider } from '@/providers/app-provider';
 import { ProtectedRoute } from '@/modules/auth/components/protected-route';
-import { LandingPage } from '@/modules/landing/pages/landing-page';
-
-const Dashboard = () => <h1>Dashboard</h1>;
-const ListDetail = () => <h1>List Detail</h1>;
+import { AppLayout } from '@/components/layout/app-layout/app-layout';
+import { PRIVATE_ROUTES, PUBLIC_ROUTES } from '@/config/routes.config';
+import { Suspense } from 'react';
+import { LoadingOverlay } from '@mantine/core';
 
 function App() {
   return (
@@ -12,12 +12,47 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
+          {PUBLIC_ROUTES.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <Suspense
+                  fallback={
+                    <LoadingOverlay
+                      overlayProps={{ radius: 'sm', blur: 2 }}
+                      visible
+                    />
+                  }
+                >
+                  {route.element}
+                </Suspense>
+              }
+            />
+          ))}
 
           {/* Private Routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/lists/:listId" element={<ListDetail />} />
+            <Route element={<AppLayout />}>
+              {PRIVATE_ROUTES.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={
+                    <Suspense
+                      fallback={
+                        <LoadingOverlay
+                          overlayProps={{ radius: 'sm', blur: 2 }}
+                          visible
+                        />
+                      }
+                    >
+                      {route.element}
+                    </Suspense>
+                  }
+                />
+              ))}
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

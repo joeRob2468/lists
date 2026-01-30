@@ -2,7 +2,7 @@ import { Button, Container, Stack, Text, Title, rem } from '@mantine/core';
 import { IconBrandGoogle } from '@tabler/icons-react';
 import { env } from '@repo/env';
 
-export const LandingPage = () => {
+export const Landing = () => {
   const handleLogin = () => {
     const returnUrl = `${window.location.origin}/dashboard`;
     window.location.href = `${env.VITE_API_URL}/auth/login/google?return_url=${encodeURIComponent(returnUrl)}`;
