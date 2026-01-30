@@ -1,5 +1,5 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
+import { string, z } from 'zod';
 import { env } from '@repo/env';
 import { users } from '@/db/schema';
 import { ApiError } from '@repo/common';
@@ -61,6 +61,7 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
         id: string;
         email: string;
         name: string;
+        picture: string;
       };
 
       const [user] = await app.db
@@ -69,10 +70,11 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
           email: googleUser.email,
           name: googleUser.name,
           googleId: googleUser.id,
+          picture: googleUser.picture,
         })
         .onConflictDoUpdate({
           target: users.email,
-          set: { googleId: googleUser.id, name: googleUser.name },
+          set: { googleId: googleUser.id, name: googleUser.name, picture: googleUser.picture },
         })
         .returning();
 

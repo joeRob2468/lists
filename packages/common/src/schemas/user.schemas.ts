@@ -4,6 +4,7 @@ export const UserSchema = z.object({
   id: z.uuid(),
   name: z.string(),
   email: z.email(),
+  picture: z.string().nullable().optional(),
   createdAt: z.coerce.date(),
 });
 

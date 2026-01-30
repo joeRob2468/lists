@@ -16,6 +16,7 @@ export const users = pgTable('users', {
   googleId: text('google_id').unique(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
+  picture: text('picture'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }) satisfies Record<keyof User, unknown>;
 
