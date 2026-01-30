@@ -1,5 +1,5 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { string, z } from 'zod';
+import { z } from 'zod';
 import { env } from '@repo/env';
 import { users } from '@/db/schema';
 import { ApiError } from '@repo/common';
