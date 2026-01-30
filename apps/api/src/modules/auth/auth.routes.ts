@@ -74,7 +74,11 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
         })
         .onConflictDoUpdate({
           target: users.email,
-          set: { googleId: googleUser.id, name: googleUser.name, picture: googleUser.picture },
+          set: {
+            googleId: googleUser.id,
+            name: googleUser.name,
+            picture: googleUser.picture,
+          },
         })
         .returning();
 
@@ -93,6 +97,18 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
       res.clearCookie('return_url');
 
       return res.redirect(returnUrl);
+    },
+  });
+
+  app.route({
+    method: 'POST',
+    url: '/logout',
+    schema: {
+      tags: ['OAuth2'],
+    },
+    handler: async (_req, res) => {
+      res.clearCookie('session');
+      res.send({ success: true });
     },
   });
 };
