@@ -1,0 +1,22 @@
+.card {
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border: 1px solid var(--mantine-color-gray-3);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mantine-shadow-md);
+  border-color: var(--mantine-color-blue-5);
+}
+
+.titleGroup {
+  margin-bottom: var(--mantine-spacing-sm);
+}
+
+.meta {
+  margin-top: var(--mantine-spacing-md);
+  padding-top: var(--mantine-spacing-sm);
+  border-top: 1px solid var(--mantine-color-gray-2);
+}
