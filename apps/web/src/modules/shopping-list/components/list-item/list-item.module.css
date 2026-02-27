@@ -1,0 +1,49 @@
+.itemRow {
+  display: flex;
+  align-items: center;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  border: 1px solid var(--mantine-color-dark-4);
+  background-color: var(--mantine-color-dark-6);
+  transition: background-color 200ms;
+}
+
+.isDragging {
+  background-color: var(--mantine-color-dark-4);
+  box-shadow: var(--mantine-shadow-md);
+  border-color: transparent;
+}
+
+.itemRow:not(:first-of-type) {
+  border-top: none;
+}
+
+.itemRow:hover {
+  background-color: var(--mantine-color-dark-5);
+}
+
+.checked {
+  opacity: 0.6;
+}
+
+.content {
+  flex: 1;
+  margin-left: var(--mantine-spacing-md);
+  margin-right: var(--mantine-spacing-md);
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: var(--mantine-color-dimmed);
+}
+
+.dragHandle {
+  cursor: grab;
+  color: var(--mantine-color-dimmed);
+  display: flex;
+  align-items: center;
+  margin-right: var(--mantine-spacing-xs);
+}
+
+.dragHandle:hover {
+  color: var(--mantine-color-dark-3);
+}
