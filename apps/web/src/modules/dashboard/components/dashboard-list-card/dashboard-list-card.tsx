@@ -24,22 +24,13 @@ export const DashboardListCard = ({ list }: DashboardListCardProps) => {
   }).format(new Date(list.updatedAt));
 
   return (
-    <Card
-      className={classes.card}
-      padding="lg"
-      radius="md"
-      onClick={() => navigate(`/lists/${list.id}`)}
-    >
+    <Card className={classes.card} padding="lg" radius="md" onClick={() => navigate(`/lists/${list.id}`)}>
       <Group justify="space-between" className={classes.titleGroup}>
         <Text fw={600} size="lg" truncate>
           {list.name}
         </Text>
         {list.isShared && (
-          <Badge
-            variant="light"
-            color="blue"
-            leftSection={<IconUsers size={12} />}
-          >
+          <Badge variant="light" color="blue" leftSection={<IconUsers size={12} />}>
             Shared
           </Badge>
         )}

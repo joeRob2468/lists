@@ -1,16 +1,7 @@
 import { apiClient } from '@/api/client';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  type DropResult,
-} from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import { Button, Group, Skeleton, Stack, Text, Title } from '@mantine/core';
-import type {
-  CreateShoppingItemSchema,
-  ShoppingItemSchema,
-  ShoppingListWithItemsSchema,
-} from '@repo/common';
+import type { CreateShoppingItemSchema, ShoppingItemSchema, ShoppingListWithItemsSchema } from '@repo/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -31,9 +22,7 @@ export const ListDetail = () => {
   const { listId: id } = useParams<{ listId: string }>();
   const queryClient = useQueryClient();
   const queryKey = ['list', id];
-  const [optimisticItems, setOptimisticItems] = useState<ShoppingItem[] | null>(
-    null,
-  );
+  const [optimisticItems, setOptimisticItems] = useState<ShoppingItem[] | null>(null);
 
   const {
     data: list,
@@ -54,8 +43,7 @@ export const ListDetail = () => {
     onMutate: async (newItem) => {
       await queryClient.cancelQueries({ queryKey });
 
-      const previousList =
-        queryClient.getQueryData<ShoppingListWithItems>(queryKey);
+      const previousList = queryClient.getQueryData<ShoppingListWithItems>(queryKey);
 
       queryClient.setQueryData<ShoppingListWithItems>(queryKey, (oldData) => {
         if (!oldData) return oldData;
@@ -89,13 +77,7 @@ export const ListDetail = () => {
   });
 
   const toggleItemMutation = useMutation({
-    mutationFn: async ({
-      itemId,
-      isChecked,
-    }: {
-      itemId: string;
-      isChecked: boolean;
-    }) => {
+    mutationFn: async ({ itemId, isChecked }: { itemId: string; isChecked: boolean }) => {
       return apiClient.patch(`lists/${id}/items/${itemId}`, {
         json: { isChecked },
       });
@@ -103,16 +85,13 @@ export const ListDetail = () => {
     onMutate: async ({ itemId, isChecked }) => {
       await queryClient.cancelQueries({ queryKey });
 
-      const previousList =
-        queryClient.getQueryData<ShoppingListWithItems>(queryKey);
+      const previousList = queryClient.getQueryData<ShoppingListWithItems>(queryKey);
 
       queryClient.setQueryData<ShoppingListWithItems>(queryKey, (oldData) => {
         if (!oldData) return oldData;
         return {
           ...oldData,
-          items: oldData.items.map((item) =>
-            item.id === itemId ? { ...item, isChecked } : item,
-          ),
+          items: oldData.items.map((item) => (item.id === itemId ? { ...item, isChecked } : item)),
         };
       });
 
@@ -128,15 +107,12 @@ export const ListDetail = () => {
 
   const deleteItemMutation = useMutation({
     mutationFn: async (itemId: string) => {
-      return apiClient
-        .delete(`lists/${id}/items/${itemId}`, { json: {} })
-        .json();
+      return apiClient.delete(`lists/${id}/items/${itemId}`, { json: {} }).json();
     },
     onMutate: async (itemId) => {
       await queryClient.cancelQueries({ queryKey });
 
-      const previousList =
-        queryClient.getQueryData<ShoppingListWithItems>(queryKey);
+      const previousList = queryClient.getQueryData<ShoppingListWithItems>(queryKey);
 
       queryClient.setQueryData<ShoppingListWithItems>(queryKey, (oldData) => {
         if (!oldData) return oldData;
@@ -158,15 +134,12 @@ export const ListDetail = () => {
 
   const reorderMutation = useMutation({
     mutationFn: async ({ itemIds }: ReorderVariables) => {
-      return apiClient
-        .patch(`lists/${id}/items/reorder`, { json: { itemIds } })
-        .json<ShoppingItem[]>();
+      return apiClient.patch(`lists/${id}/items/reorder`, { json: { itemIds } }).json<ShoppingItem[]>();
     },
     onMutate: async ({ newItems }) => {
       await queryClient.cancelQueries({ queryKey });
 
-      const previousList =
-        queryClient.getQueryData<ShoppingListWithItems>(queryKey);
+      const previousList = queryClient.getQueryData<ShoppingListWithItems>(queryKey);
 
       queryClient.setQueryData<ShoppingListWithItems>(queryKey, (oldData) => {
         if (!oldData) return oldData;
@@ -261,9 +234,7 @@ export const ListDetail = () => {
                         draggableProps={provided.draggableProps}
                         dragHandleProps={provided.dragHandleProps}
                         isDragging={snapshot.isDragging}
-                        onToggle={(itemId, isChecked) =>
-                          toggleItemMutation.mutate({ itemId, isChecked })
-                        }
+                        onToggle={(itemId, isChecked) => toggleItemMutation.mutate({ itemId, isChecked })}
                         onDelete={(itemId) => deleteItemMutation.mutate(itemId)}
                       />
                     )}
@@ -275,10 +246,7 @@ export const ListDetail = () => {
           </Droppable>
         </DragDropContext>
 
-        <AddItemForm
-          onAdd={(values) => addItemMutation.mutate(values)}
-          isLoading={addItemMutation.isPending}
-        />
+        <AddItemForm onAdd={(values) => addItemMutation.mutate(values)} isLoading={addItemMutation.isPending} />
       </div>
 
       {checkedItems.length > 0 && (
@@ -289,13 +257,9 @@ export const ListDetail = () => {
               <ListItem
                 key={item.id}
                 item={item}
-                onToggle={(itemId, isChecked) =>
-                  toggleItemMutation.mutate({ itemId, isChecked })
-                }
+                onToggle={(itemId, isChecked) => toggleItemMutation.mutate({ itemId, isChecked })}
                 onDelete={(itemId) => deleteItemMutation.mutate(itemId)}
-                isPending={
-                  toggleItemMutation.isPending || deleteItemMutation.isPending
-                }
+                isPending={toggleItemMutation.isPending || deleteItemMutation.isPending}
               />
             ))}
           </Stack>

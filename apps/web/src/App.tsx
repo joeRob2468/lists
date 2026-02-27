@@ -17,14 +17,7 @@ function App() {
               key={route.path}
               path={route.path}
               element={
-                <Suspense
-                  fallback={
-                    <LoadingOverlay
-                      overlayProps={{ radius: 'sm', blur: 2 }}
-                      visible
-                    />
-                  }
-                >
+                <Suspense fallback={<LoadingOverlay overlayProps={{ radius: 'sm', blur: 2 }} visible />}>
                   {route.element}
                 </Suspense>
               }
@@ -39,14 +32,7 @@ function App() {
                   key={route.path}
                   path={route.path}
                   element={
-                    <Suspense
-                      fallback={
-                        <LoadingOverlay
-                          overlayProps={{ radius: 'sm', blur: 2 }}
-                          visible
-                        />
-                      }
-                    >
+                    <Suspense fallback={<LoadingOverlay overlayProps={{ radius: 'sm', blur: 2 }} visible />}>
                       {route.element}
                     </Suspense>
                   }

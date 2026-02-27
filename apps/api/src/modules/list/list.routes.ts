@@ -81,11 +81,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       }
 
       if (list.ownerId !== req.user.id && !list.isShared) {
-        throw new ApiError(
-          403,
-          'FORBIDDEN',
-          'You do not have access to this list',
-        );
+        throw new ApiError(403, 'FORBIDDEN', 'You do not have access to this list');
       }
 
       return list;
@@ -135,10 +131,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       const { templateId, newName } = req.body;
 
       const template = await app.db.query.shoppingLists.findFirst({
-        where: and(
-          eq(shoppingLists.id, templateId),
-          eq(shoppingLists.isTemplate, true),
-        ),
+        where: and(eq(shoppingLists.id, templateId), eq(shoppingLists.isTemplate, true)),
         with: { items: true },
       });
 
@@ -194,12 +187,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       const [updated] = await app.db
         .update(shoppingLists)
         .set(req.body)
-        .where(
-          and(
-            eq(shoppingLists.id, req.params.id),
-            eq(shoppingLists.ownerId, req.user.id),
-          ),
-        )
+        .where(and(eq(shoppingLists.id, req.params.id), eq(shoppingLists.ownerId, req.user.id)))
         .returning();
 
       if (!updated) {
@@ -223,12 +211,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
     handler: async (req, res) => {
       const result = await app.db
         .delete(shoppingLists)
-        .where(
-          and(
-            eq(shoppingLists.id, req.params.id),
-            eq(shoppingLists.ownerId, req.user.id),
-          ),
-        )
+        .where(and(eq(shoppingLists.id, req.params.id), eq(shoppingLists.ownerId, req.user.id)))
         .returning({ id: shoppingLists.id });
 
       if (result.length === 0) {
@@ -255,10 +238,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
     },
     handler: async (req, res) => {
       const list = await app.db.query.shoppingLists.findFirst({
-        where: and(
-          eq(shoppingLists.id, req.params.id),
-          eq(shoppingLists.ownerId, req.user.id),
-        ),
+        where: and(eq(shoppingLists.id, req.params.id), eq(shoppingLists.ownerId, req.user.id)),
       });
 
       if (!list) {
@@ -283,10 +263,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         })
         .returning();
 
-      await app.db
-        .update(shoppingLists)
-        .set({ updatedAt: new Date() })
-        .where(eq(shoppingLists.id, list.id));
+      await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, list.id));
 
       res.status(201);
       return item;
@@ -315,10 +292,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
             eq(shoppingItems.listId, req.params.id),
             inArray(
               shoppingItems.listId,
-              app.db
-                .select({ id: shoppingLists.id })
-                .from(shoppingLists)
-                .where(eq(shoppingLists.ownerId, req.user.id)),
+              app.db.select({ id: shoppingLists.id }).from(shoppingLists).where(eq(shoppingLists.ownerId, req.user.id)),
             ),
           ),
         )
@@ -328,10 +302,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         throw new ApiError(404, 'NOT_FOUND', 'Item or List not found');
       }
 
-      await app.db
-        .update(shoppingLists)
-        .set({ updatedAt: new Date() })
-        .where(eq(shoppingLists.id, req.params.id));
+      await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, req.params.id));
 
       return updated;
     },
@@ -355,10 +326,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       const listId = req.params.id;
 
       const list = await app.db.query.shoppingLists.findFirst({
-        where: and(
-          eq(shoppingLists.id, listId),
-          eq(shoppingLists.ownerId, req.user.id),
-        ),
+        where: and(eq(shoppingLists.id, listId), eq(shoppingLists.ownerId, req.user.id)),
       });
 
       if (!list) {
@@ -371,20 +339,12 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
             tx
               .update(shoppingItems)
               .set({ position: index })
-              .where(
-                and(
-                  eq(shoppingItems.id, itemId),
-                  eq(shoppingItems.listId, listId),
-                ),
-              ),
+              .where(and(eq(shoppingItems.id, itemId), eq(shoppingItems.listId, listId))),
           ),
         );
       });
 
-      await app.db
-        .update(shoppingLists)
-        .set({ updatedAt: new Date() })
-        .where(eq(shoppingLists.id, list.id));
+      await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, list.id));
 
       const updatedItems = await app.db.query.shoppingItems.findMany({
         where: eq(shoppingItems.listId, listId),
@@ -415,10 +375,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
             eq(shoppingItems.listId, req.params.id),
             inArray(
               shoppingItems.listId,
-              app.db
-                .select({ id: shoppingLists.id })
-                .from(shoppingLists)
-                .where(eq(shoppingLists.ownerId, req.user.id)),
+              app.db.select({ id: shoppingLists.id }).from(shoppingLists).where(eq(shoppingLists.ownerId, req.user.id)),
             ),
           ),
         )
@@ -428,10 +385,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         throw new ApiError(404, 'NOT_FOUND', 'Item not found');
       }
 
-      await app.db
-        .update(shoppingLists)
-        .set({ updatedAt: new Date() })
-        .where(eq(shoppingLists.id, req.params.id));
+      await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, req.params.id));
 
       res.status(204).send(null);
     },

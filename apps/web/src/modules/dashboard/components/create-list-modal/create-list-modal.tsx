@@ -35,9 +35,7 @@ export const CreateListModal = ({ opened, onClose }: CreateListModalProps) => {
 
   const mutation = useMutation({
     mutationFn: async (values: CreateListFormValues) => {
-      return apiClient
-        .post('lists', { json: values })
-        .json<z.infer<typeof ShoppingListSchema>>();
+      return apiClient.post('lists', { json: values }).json<z.infer<typeof ShoppingListSchema>>();
     },
     onSuccess: (newList) => {
       queryClient.invalidateQueries({ queryKey: ['lists'] });

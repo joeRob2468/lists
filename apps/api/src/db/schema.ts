@@ -1,13 +1,6 @@
 import { User } from '@repo/common';
 import { relations } from 'drizzle-orm';
-import {
-  boolean,
-  integer,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-zod';
 
 // --- Users ---
@@ -39,16 +32,13 @@ export const shoppingLists = pgTable('shopping_lists', {
     .$onUpdate(() => new Date()),
 });
 
-export const shoppingListsRelations = relations(
-  shoppingLists,
-  ({ one, many }) => ({
-    owner: one(users, {
-      fields: [shoppingLists.ownerId],
-      references: [users.id],
-    }),
-    items: many(shoppingItems),
+export const shoppingListsRelations = relations(shoppingLists, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [shoppingLists.ownerId],
+    references: [users.id],
   }),
-);
+  items: many(shoppingItems),
+}));
 
 // --- Shopping Items ---
 export const shoppingItems = pgTable('shopping_items', {

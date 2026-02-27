@@ -31,10 +31,7 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
         maxAge: 60 * 10, // 10 minutes
       });
 
-      const authorizationUri = await app.google.generateAuthorizationUri(
-        req,
-        res,
-      );
+      const authorizationUri = await app.google.generateAuthorizationUri(req, res);
 
       return res.redirect(authorizationUri);
     },
@@ -48,15 +45,11 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
       querystring: z.looseObject({ state: z.string().optional() }),
     },
     handler: async (req, res) => {
-      const { token } =
-        await app.google.getAccessTokenFromAuthorizationCodeFlow(req);
+      const { token } = await app.google.getAccessTokenFromAuthorizationCodeFlow(req);
 
-      const userInfoResponse = await fetch(
-        'https://www.googleapis.com/oauth2/v2/userinfo',
-        {
-          headers: { Authorization: `Bearer ${token.access_token}` },
-        },
-      );
+      const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${token.access_token}` },
+      });
       const googleUser = (await userInfoResponse.json()) as {
         id: string;
         email: string;

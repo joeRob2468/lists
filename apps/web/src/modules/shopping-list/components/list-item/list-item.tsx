@@ -1,7 +1,4 @@
-import type {
-  DraggableProvidedDraggableProps,
-  DraggableProvidedDragHandleProps,
-} from '@hello-pangea/dnd';
+import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import { ActionIcon, Badge, Checkbox, Group, Text } from '@mantine/core';
 import type { ShoppingItemSchema } from '@repo/common';
 import { IconGripVertical, IconTrash } from '@tabler/icons-react';
@@ -52,10 +49,7 @@ export const ListItem = ({
       />
       <div className={classes.content}>
         <Group gap="xs">
-          <Text
-            className={item.isChecked ? classes.strikethrough : undefined}
-            fw={500}
-          >
+          <Text className={item.isChecked ? classes.strikethrough : undefined} fw={500}>
             {item.name}
           </Text>
           {item.quantity > 1 && (
@@ -66,12 +60,7 @@ export const ListItem = ({
         </Group>
       </div>
 
-      <ActionIcon
-        variant="subtle"
-        color="red"
-        onClick={() => onDelete(item.id)}
-        loading={isPending}
-      >
+      <ActionIcon variant="subtle" color="red" onClick={() => onDelete(item.id)} loading={isPending}>
         <IconTrash size={16} />
       </ActionIcon>
     </div>

@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import {
-  Title,
-  Text,
-  Group,
-  Button,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-} from '@mantine/core';
+import { Title, Text, Group, Button, SimpleGrid, Skeleton, Stack } from '@mantine/core';
 import { IconPlus, IconTemplate } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { ShoppingListSchema } from '@repo/common';
@@ -31,20 +23,13 @@ export const Dashboard = () => {
   } = useQuery({
     queryKey: ['lists', { isTemplate: false }],
     queryFn: async () => {
-      return apiClient
-        .get('lists', { searchParams: { isTemplate: false } })
-        .json<ShoppingList[]>();
+      return apiClient.get('lists', { searchParams: { isTemplate: false } }).json<ShoppingList[]>();
     },
   });
 
   // Determine greeting based on time of day
   const hour = new Date().getHours();
-  const greeting =
-    hour < 12
-      ? 'Good morning!'
-      : hour < 18
-        ? 'Good afternoon!'
-        : 'Good evening!';
+  const greeting = hour < 12 ? 'Good morning!' : hour < 18 ? 'Good afternoon!' : 'Good evening!';
 
   return (
     <div className={classes.container}>
@@ -66,10 +51,7 @@ export const Dashboard = () => {
             >
               Use Template
             </Button>
-            <Button
-              leftSection={<IconPlus size={18} />}
-              onClick={() => setCreateModalOpen(true)}
-            >
+            <Button leftSection={<IconPlus size={18} />} onClick={() => setCreateModalOpen(true)}>
               New List
             </Button>
           </Group>
@@ -106,10 +88,7 @@ export const Dashboard = () => {
         )}
       </Stack>
 
-      <CreateListModal
-        opened={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-      />
+      <CreateListModal opened={createModalOpen} onClose={() => setCreateModalOpen(false)} />
     </div>
   );
 };
