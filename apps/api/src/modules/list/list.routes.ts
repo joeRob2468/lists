@@ -27,7 +27,10 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       tags: ['Lists'],
       summary: 'Get all lists for current user',
       querystring: z.object({
-        isTemplate: z.coerce.boolean().optional(),
+        isTemplate: z
+          .enum(['true', 'false'])
+          .transform((value) => value === 'true')
+          .optional(),
       }),
       response: {
         200: z.array(ShoppingListSchema),
