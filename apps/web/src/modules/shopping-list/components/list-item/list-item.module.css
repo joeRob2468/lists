@@ -21,6 +21,17 @@
   background-color: var(--mantine-color-dark-5);
 }
 
+.deleteButton {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.itemRow:hover .deleteButton, .itemRow:focus-within .deleteButton {
+  opacity: 1;
+  visibility: visible;
+}
+
 .checked {
   opacity: 0.6;
 }

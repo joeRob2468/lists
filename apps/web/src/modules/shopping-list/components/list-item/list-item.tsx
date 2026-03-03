@@ -60,7 +60,7 @@ export const ListItem = ({
         </Group>
       </div>
 
-      <ActionIcon variant="subtle" color="red" onClick={() => onDelete(item.id)} loading={isPending}>
+      <ActionIcon className={classes.deleteButton} variant="subtle" color="red" onClick={() => onDelete(item.id)} loading={isPending}>
         <IconTrash size={16} />
       </ActionIcon>
     </div>
