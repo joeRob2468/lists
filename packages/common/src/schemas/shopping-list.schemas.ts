@@ -1,15 +1,21 @@
 import { z } from 'zod';
 
-export const ShoppingItemSchema = z.object({
+const ShoppingItemCore = z.object({
   id: z.uuid(),
   listId: z.uuid(),
   name: z.string().min(1),
   category: z.string().optional().nullable(),
-  quantity: z.number().int().min(1).default(1),
-  isChecked: z.boolean().default(false),
-  position: z.number().int().default(0),
+  quantity: z.number().int().min(1),
+  isChecked: z.boolean(),
+  position: z.number().int(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+});
+
+export const ShoppingItemSchema = ShoppingItemCore.extend({
+  quantity: ShoppingItemCore.shape.quantity.default(1),
+  isChecked: ShoppingItemCore.shape.isChecked.default(false),
+  position: ShoppingItemCore.shape.position.default(0),
 });
 
 export const CreateShoppingItemSchema = ShoppingItemSchema.pick({
@@ -18,7 +24,7 @@ export const CreateShoppingItemSchema = ShoppingItemSchema.pick({
   quantity: true,
 });
 
-export const UpdateShoppingItemSchema = ShoppingItemSchema.partial().pick({
+export const UpdateShoppingItemSchema = ShoppingItemCore.partial().pick({
   name: true,
   category: true,
   quantity: true,
@@ -30,14 +36,19 @@ export const ReorderShoppingItemsSchema = z.object({
   itemIds: z.array(z.uuid()).min(1),
 });
 
-export const ShoppingListSchema = z.object({
+const ShoppingListCore = z.object({
   id: z.uuid(),
   ownerId: z.uuid(),
   name: z.string().min(1),
-  isTemplate: z.boolean().default(false),
-  isShared: z.boolean().default(false),
+  isTemplate: z.boolean(),
+  isShared: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+});
+
+export const ShoppingListSchema = ShoppingListCore.extend({
+  isTemplate: ShoppingListCore.shape.isTemplate.default(false),
+  isShared: ShoppingListCore.shape.isShared.default(false),
 });
 
 export const ShoppingListWithItemsSchema = ShoppingListSchema.extend({
@@ -49,7 +60,7 @@ export const CreateShoppingListSchema = z.object({
   isTemplate: z.boolean().optional().default(false),
 });
 
-export const UpdateShoppingListSchema = ShoppingListSchema.partial().pick({
+export const UpdateShoppingListSchema = ShoppingListCore.partial().pick({
   name: true,
   isShared: true,
   isTemplate: true,

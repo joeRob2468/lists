@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const UserSchema = z.object({
+const UserCore = z.object({
   id: z.uuid(),
   name: z.string(),
   email: z.email(),
@@ -8,7 +8,14 @@ export const UserSchema = z.object({
   createdAt: z.coerce.date(),
 });
 
+export const UserSchema = UserCore;
 export type User = z.infer<typeof UserSchema>;
 
-export const CreateUserSchema = UserSchema.omit({ id: true });
+export const CreateUserSchema = UserCore.omit({ id: true, createdAt: true });
 export type CreateUser = z.infer<typeof CreateUserSchema>;
+
+export const UpdateUserSchema = UserCore.partial().pick({
+  name: true,
+  picture: true,
+});
+export type UpdateUser = z.infer<typeof UpdateUserSchema>;
