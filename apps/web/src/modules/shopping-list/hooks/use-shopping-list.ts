@@ -1,5 +1,10 @@
 import { apiClient } from '@/api/client';
-import type { CreateShoppingItemSchema, ShoppingItemSchema, ShoppingListWithItemsSchema } from '@repo/common';
+import type {
+  CreateShoppingItemSchema,
+  ShoppingItemSchema,
+  ShoppingListWithItemsSchema,
+  UpdateShoppingItemSchema,
+} from '@repo/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -7,6 +12,7 @@ import { z } from 'zod';
 type ShoppingListWithItems = z.infer<typeof ShoppingListWithItemsSchema>;
 type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
 type CreateItemInput = z.input<typeof CreateShoppingItemSchema>;
+type UpdateItemInput = z.input<typeof UpdateShoppingItemSchema>;
 
 export const useShoppingList = (listId?: string) => {
   const queryClient = useQueryClient();
@@ -94,6 +100,33 @@ export const useShoppingList = (listId?: string) => {
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
   });
 
+  const updateItemMutation = useMutation({
+    mutationFn: async ({ itemId, data }: { itemId: string; data: UpdateItemInput }) => {
+      return apiClient.patch(`lists/${listId}/items/${itemId}`, { json: data }).json();
+    },
+    onMutate: async ({ itemId, data }) => {
+      await queryClient.cancelQueries({ queryKey });
+
+      const previousList = queryClient.getQueryData<ShoppingListWithItems>(queryKey);
+
+      queryClient.setQueryData<ShoppingListWithItems>(queryKey, (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          items: oldData.items.map((item) => (item.id === itemId ? { ...item, ...data } : item)),
+        };
+      });
+
+      return { previousList };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousList) {
+        queryClient.setQueryData(queryKey, context.previousList);
+      }
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
   const deleteItemMutation = useMutation({
     mutationFn: async (itemId: string) => {
       return apiClient.delete(`lists/${listId}/items/${itemId}`, { json: {} }).json();
@@ -161,6 +194,7 @@ export const useShoppingList = (listId?: string) => {
     error,
     addItem: addItemMutation.mutate,
     toggleItem: toggleItemMutation.mutate,
+    updateItem: updateItemMutation.mutate,
     deleteItem: deleteItemMutation.mutate,
     reorderItems: reorderMutation.mutate,
   };

@@ -7,7 +7,7 @@ import classes from './list-detail.module.css';
 
 export const ListDetail = () => {
   const { listId } = useParams<{ listId: string }>();
-  const { list, items, isLoading, error, addItem, toggleItem, deleteItem, reorderItems, isPending } =
+  const { list, items, isLoading, error, addItem, toggleItem, updateItem, deleteItem, reorderItems, isPending } =
     useShoppingList(listId);
 
   const activeItems = items.filter((item) => !item.isChecked);
@@ -51,6 +51,7 @@ export const ListDetail = () => {
           items={activeItems}
           enableDrag={true}
           onToggle={toggleItem}
+          onUpdate={updateItem}
           onDelete={deleteItem}
           onReorder={(newActiveItems) => {
             const newItems = [...newActiveItems, ...checkedItems];
@@ -63,7 +64,13 @@ export const ListDetail = () => {
       {checkedItems.length > 0 && (
         <div className={classes.listGroup}>
           <Text className={classes.sectionTitle}>Completed</Text>
-          <ShoppingItemList items={checkedItems} enableDrag={false} onToggle={toggleItem} onDelete={deleteItem} />
+          <ShoppingItemList
+            items={checkedItems}
+            enableDrag={false}
+            onToggle={toggleItem}
+            onUpdate={updateItem}
+            onDelete={deleteItem}
+          />
         </div>
       )}
     </div>

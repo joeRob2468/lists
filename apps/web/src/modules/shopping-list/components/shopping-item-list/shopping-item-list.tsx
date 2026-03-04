@@ -1,13 +1,15 @@
 import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
-import type { ShoppingItemSchema } from '@repo/common';
+import type { ShoppingItemSchema, UpdateShoppingItemSchema } from '@repo/common';
 import { z } from 'zod';
 import { ListItem } from '../../components/list-item/list-item';
 
 type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
+type UpdateItemInput = z.input<typeof UpdateShoppingItemSchema>;
 
 interface BaseShoppingItemListProps {
   items: ShoppingItem[];
   onToggle: (data: { itemId: string; isChecked: boolean }) => void;
+  onUpdate: (data: { itemId: string; data: UpdateItemInput }) => void;
   onDelete: (itemId: string) => void;
   renderHeader?: () => React.ReactNode;
   renderFooter?: () => React.ReactNode;
@@ -32,6 +34,7 @@ export const ShoppingItemList = ({
   droppableId,
   enableDrag = false,
   onToggle,
+  onUpdate,
   onDelete,
   onReorder,
   renderHeader,
@@ -65,6 +68,7 @@ export const ShoppingItemList = ({
                 dragHandleProps={provided.dragHandleProps}
                 isDragging={snapshot.isDragging}
                 onToggle={(itemId, isChecked) => onToggle({ itemId, isChecked })}
+                onUpdate={(itemId, data) => onUpdate({ itemId, data })}
                 onDelete={(itemId) => onDelete(itemId)}
               />
             )}
@@ -74,6 +78,7 @@ export const ShoppingItemList = ({
             key={item.id}
             item={item}
             onToggle={(itemId, isChecked) => onToggle({ itemId, isChecked })}
+            onUpdate={(itemId, data) => onUpdate({ itemId, data })}
             onDelete={onDelete}
           />
         ),

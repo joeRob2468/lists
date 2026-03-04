@@ -42,11 +42,6 @@
   margin-right: var(--mantine-spacing-md);
 }
 
-.strikethrough {
-  text-decoration: line-through;
-  color: var(--mantine-color-dimmed);
-}
-
 .dragHandle {
   cursor: grab;
   color: var(--mantine-color-dimmed);
@@ -57,4 +52,20 @@
 
 .dragHandle:hover {
   color: var(--mantine-color-dark-3);
+}
+
+.textInput {
+  flex: 1;
+}
+
+.textInput input {
+  padding: 0;
+  height: auto;
+  color: var(--mantine-color-text);
+  min-height: 24px;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: var(--mantine-color-dimmed);
 }
