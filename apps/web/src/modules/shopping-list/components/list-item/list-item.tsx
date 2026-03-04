@@ -74,6 +74,12 @@ export const ListItem = ({
             value={nameValue}
             onChange={(e) => setNameValue(e.currentTarget.value)}
             onBlur={handleSubmit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
             className={`${classes.textInput} ${item.isChecked ? classes.strikethrough : undefined}`}
             fw={500}
           />
