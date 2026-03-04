@@ -14,7 +14,7 @@ interface AddItemFormProps {
 }
 
 export const AddItemForm = ({ onAdd, isLoading }: AddItemFormProps) => {
-  const { register, handleSubmit, reset } = useForm<CreateItemFormValues>({
+  const { register, handleSubmit, reset, getValues } = useForm<CreateItemFormValues>({
     resolver: zodResolver(CreateShoppingItemSchema),
     defaultValues: { name: '', quantity: 1, category: null },
   });
@@ -25,8 +25,17 @@ export const AddItemForm = ({ onAdd, isLoading }: AddItemFormProps) => {
     reset();
   };
 
+  const handleBlur = async (e: React.FocusEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      const values = getValues();
+      if (values.name?.trim()) {
+        handleSubmit(onSubmit)();
+      }
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={classes.container}>
+    <form onSubmit={handleSubmit(onSubmit)} onBlur={handleBlur} className={classes.container}>
       <div className={classes.iconWrapper}>
         <IconPlus size={20} />
       </div>
