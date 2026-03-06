@@ -1,12 +1,12 @@
 import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import type { ShoppingItemSchema, UpdateShoppingItemSchema } from '@repo/common';
 import { z } from 'zod';
-import { ListItem } from '../../components/list-item/list-item';
+import { ShoppingItemRow } from '../shopping-item-row/shopping-item-row';
 
 type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
 type UpdateItemInput = z.input<typeof UpdateShoppingItemSchema>;
 
-interface BaseShoppingItemListProps {
+interface BaseShoppingItemsListProps {
   items: ShoppingItem[];
   onToggle: (data: { itemId: string; isChecked: boolean }) => void;
   onUpdate: (data: { itemId: string; data: UpdateItemInput }) => void;
@@ -15,21 +15,21 @@ interface BaseShoppingItemListProps {
   renderFooter?: () => React.ReactNode;
 }
 
-interface DraggableProps extends BaseShoppingItemListProps {
+interface DraggableProps extends BaseShoppingItemsListProps {
   enableDrag: true;
   droppableId?: string;
   onReorder: (items: ShoppingItem[]) => void;
 }
 
-interface StaticProps extends BaseShoppingItemListProps {
+interface StaticProps extends BaseShoppingItemsListProps {
   enableDrag: false;
   droppableId?: never;
   onReorder?: never;
 }
 
-type ShoppingItemListProps = DraggableProps | StaticProps;
+type ShoppingItemsListProps = DraggableProps | StaticProps;
 
-export const ShoppingItemList = ({
+export const ShoppingItemsList = ({
   items,
   droppableId,
   enableDrag = false,
@@ -39,7 +39,7 @@ export const ShoppingItemList = ({
   onReorder,
   renderHeader,
   renderFooter,
-}: ShoppingItemListProps) => {
+}: ShoppingItemsListProps) => {
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination || !onReorder) return;
 
@@ -61,7 +61,7 @@ export const ShoppingItemList = ({
         enableDrag ? (
           <Draggable key={item.id} draggableId={item.id} index={index}>
             {(provided, snapshot) => (
-              <ListItem
+              <ShoppingItemRow
                 item={item}
                 innerRef={provided.innerRef}
                 draggableProps={provided.draggableProps}
@@ -74,7 +74,7 @@ export const ShoppingItemList = ({
             )}
           </Draggable>
         ) : (
-          <ListItem
+          <ShoppingItemRow
             key={item.id}
             item={item}
             onToggle={(itemId, isChecked) => onToggle({ itemId, isChecked })}

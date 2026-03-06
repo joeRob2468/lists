@@ -8,29 +8,29 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import classes from './create-list-modal.module.css';
+import classes from './shopping-list-create-modal.module.css';
 
 const FormSchema = CreateShoppingListSchema.pick({
   name: true,
 });
 type FormValues = z.infer<typeof FormSchema>;
-export type CreateModalMode = 'create-list' | 'create-template' | 'use-template';
+export type ShoppingListCreateModalMode = 'create-list' | 'create-template' | 'use-template';
 
-interface CreateListModalProps {
+interface ShoppingListCreateModalProps {
   opened: boolean;
   onClose: () => void;
-  mode?: CreateModalMode;
+  mode?: ShoppingListCreateModalMode;
   templateId?: string;
   initialName?: string;
 }
 
-export const CreateListModal = ({
+export const ShoppingListCreateModal = ({
   opened,
   onClose,
   mode = 'create-list',
   templateId,
   initialName = '',
-}: CreateListModalProps) => {
+}: ShoppingListCreateModalProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 

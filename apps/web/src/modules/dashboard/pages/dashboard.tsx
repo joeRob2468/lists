@@ -1,8 +1,8 @@
 import { apiClient } from '@/api/client';
 import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
-import { CreateListModal } from '@/modules/shopping-list/components/create-list-modal/create-list-modal';
 import { ShoppingListCard } from '@/modules/shopping-list/components/shopping-list-card/shopping-list-card';
+import { ShoppingListCreateModal } from '@/modules/shopping-list/components/shopping-list-create-modal/shopping-list-create-modal';
 import { Button, Container, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
 import { ShoppingListSchema } from '@repo/common';
 import { IconPlus, IconTemplate } from '@tabler/icons-react';
@@ -74,7 +74,7 @@ export const Dashboard = () => {
         )}
       </Stack>
 
-      <CreateListModal opened={createModalOpen} onClose={() => setCreateModalOpen(false)} />
+      <ShoppingListCreateModal opened={createModalOpen} onClose={() => setCreateModalOpen(false)} />
     </Container>
   );
 };

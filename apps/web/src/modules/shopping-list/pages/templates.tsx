@@ -1,9 +1,6 @@
 import { apiClient } from '@/api/client';
 import { PageHeader } from '@/components/ui/page-header/page-header';
-import {
-  CreateListModal,
-  type CreateModalMode,
-} from '@/modules/shopping-list/components/create-list-modal/create-list-modal';
+import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { Button, Container, Menu, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
 import { ShoppingListSchema } from '@repo/common';
 import { IconCopy, IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
@@ -12,7 +9,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { ShoppingListCard } from '../components/shopping-list-card/shopping-list-card';
-import { SectionHeader } from '@/components/ui/section-header/section-header';
+import {
+  ShoppingListCreateModal,
+  type ShoppingListCreateModalMode,
+} from '../components/shopping-list-create-modal/shopping-list-create-modal';
 
 type ShoppingListArray = z.infer<typeof ShoppingListSchema>[];
 
@@ -21,7 +21,7 @@ export const Templates = () => {
   const navigate = useNavigate();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<CreateModalMode>('create-template');
+  const [modalMode, setModalMode] = useState<ShoppingListCreateModalMode>('create-template');
   const [selectedTemplate, setSelectedTemplate] = useState<{ id: string; name: string } | undefined>(undefined);
 
   const {
@@ -123,7 +123,7 @@ export const Templates = () => {
         )}
       </Stack>
 
-      <CreateListModal
+      <ShoppingListCreateModal
         opened={modalOpen}
         onClose={() => setModalOpen(false)}
         mode={modalMode}

@@ -4,12 +4,12 @@ import type { ShoppingItemSchema, UpdateShoppingItemSchema } from '@repo/common'
 import { IconGripVertical, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import type z from 'zod';
-import classes from './list-item.module.css';
+import classes from './shopping-item-row.module.css';
 
 type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
 type UpdateItemInput = z.input<typeof UpdateShoppingItemSchema>;
 
-interface ListItemProps {
+interface ShoppingItemRowProps {
   item: ShoppingItem;
   onToggle: (id: string, isChecked: boolean) => void;
   onDelete: (id: string) => void;
@@ -21,7 +21,7 @@ interface ListItemProps {
   isDragging?: boolean;
 }
 
-export const ListItem = ({
+export const ShoppingItemRow = ({
   item,
   onToggle,
   onDelete,
@@ -31,7 +31,7 @@ export const ListItem = ({
   draggableProps,
   innerRef,
   isDragging,
-}: ListItemProps) => {
+}: ShoppingItemRowProps) => {
   const [nameValue, setNameValue] = useState(item.name);
 
   useEffect(() => {

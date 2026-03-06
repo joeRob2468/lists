@@ -1,12 +1,12 @@
 import { PageHeader } from '@/components/ui/page-header/page-header';
+import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { Button, Container, Skeleton, Stack, Text } from '@mantine/core';
 import { IconShare } from '@tabler/icons-react';
 import { useParams } from 'react-router-dom';
-import { AddItemForm } from '../components/add-item-form/add-item-form';
-import { ShoppingItemList } from '../components/shopping-item-list/shopping-item-list';
+import { ShoppingItemAddForm } from '../components/shopping-item-add-form/shopping-item-add-form';
+import { ShoppingItemsList } from '../components/shopping-items-list/shopping-items-list';
 import { useShoppingList } from '../hooks/use-shopping-list';
 import classes from './list-detail.module.css';
-import { SectionHeader } from '@/components/ui/section-header/section-header';
 
 export const ListDetail = () => {
   const { listId } = useParams<{ listId: string }>();
@@ -50,7 +50,7 @@ export const ListDetail = () => {
       />
 
       <div className={classes.listGroup}>
-        <ShoppingItemList
+        <ShoppingItemsList
           items={activeItems}
           enableDrag={true}
           onToggle={toggleItem}
@@ -61,13 +61,13 @@ export const ListDetail = () => {
             reorderItems(newItems);
           }}
         />
-        <AddItemForm onAdd={(values) => addItem(values)} isLoading={isPending} />
+        <ShoppingItemAddForm onAdd={(values) => addItem(values)} isLoading={isPending} />
       </div>
 
       {checkedItems.length > 0 && (
         <div className={classes.listGroup}>
           <SectionHeader title="completed" />
-          <ShoppingItemList
+          <ShoppingItemsList
             items={checkedItems}
             enableDrag={false}
             onToggle={toggleItem}

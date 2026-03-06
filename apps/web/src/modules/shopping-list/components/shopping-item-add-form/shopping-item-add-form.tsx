@@ -4,16 +4,16 @@ import { CreateShoppingItemSchema } from '@repo/common';
 import { IconPlus } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import classes from './add-item-form.module.css';
+import classes from './shopping-item-add-form.module.css';
 
 type CreateItemFormValues = z.input<typeof CreateShoppingItemSchema>;
 
-interface AddItemFormProps {
+interface ShoppingItemAddFormProps {
   onAdd: (values: CreateItemFormValues) => void;
   isLoading?: boolean;
 }
 
-export const AddItemForm = ({ onAdd, isLoading }: AddItemFormProps) => {
+export const ShoppingItemAddForm = ({ onAdd, isLoading }: ShoppingItemAddFormProps) => {
   const { register, handleSubmit, reset, getValues } = useForm<CreateItemFormValues>({
     resolver: zodResolver(CreateShoppingItemSchema),
     defaultValues: { name: '', quantity: 1, category: null },
