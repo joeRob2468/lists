@@ -41,6 +41,7 @@ export const ListDetail = () => {
     <Container size="xl" py="md">
       <PageHeader
         title={list.name}
+        subtitle="Add, reorder, or remove items from your list."
         actions={
           <Button leftSection={<IconShare size={18} />} onClick={() => console.log('TODO: share modal')}>
             Share
