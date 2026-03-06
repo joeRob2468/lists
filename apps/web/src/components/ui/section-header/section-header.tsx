@@ -1,10 +1,14 @@
-import { Text } from '@mantine/core';
+import { Box, Text, type BoxProps } from '@mantine/core';
 import classes from './section-header.module.css';
 
-interface SectionHeaderProps {
+interface SectionHeaderProps extends BoxProps {
   title: string;
 }
 
-export const SectionHeader = ({ title }: SectionHeaderProps) => {
-  return <Text className={classes.sectionTitle}>{title}</Text>;
+export const SectionHeader = ({ title, ...props }: SectionHeaderProps) => {
+  return (
+    <Box {...props}>
+      <Text className={classes.sectionTitle}>{title}</Text>
+    </Box>
+  );
 };

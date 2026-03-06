@@ -6,7 +6,6 @@ import { useParams } from 'react-router-dom';
 import { ShoppingItemAddForm } from '../components/shopping-item-add-form/shopping-item-add-form';
 import { ShoppingItemsList } from '../components/shopping-items-list/shopping-items-list';
 import { useShoppingList } from '../hooks/use-shopping-list';
-import classes from './list-detail.module.css';
 
 export const ListDetail = () => {
   const { listId } = useParams<{ listId: string }>();
@@ -18,7 +17,7 @@ export const ListDetail = () => {
 
   if (isLoading) {
     return (
-      <div className={classes.container}>
+      <Container size="xl" py="md">
         <Skeleton height={50} mb="xl" />
         <Skeleton height={40} mb="xl" />
         <Stack>
@@ -26,7 +25,7 @@ export const ListDetail = () => {
           <Skeleton height={60} />
           <Skeleton height={60} />
         </Stack>
-      </div>
+      </Container>
     );
   }
 
@@ -49,24 +48,22 @@ export const ListDetail = () => {
         }
       />
 
-      <div className={classes.listGroup}>
-        <ShoppingItemsList
-          items={activeItems}
-          enableDrag={true}
-          onToggle={toggleItem}
-          onUpdate={updateItem}
-          onDelete={deleteItem}
-          onReorder={(newActiveItems) => {
-            const newItems = [...newActiveItems, ...checkedItems];
-            reorderItems(newItems);
-          }}
-        />
-        <ShoppingItemAddForm onAdd={(values) => addItem(values)} isLoading={isPending} />
-      </div>
+      <ShoppingItemsList
+        items={activeItems}
+        enableDrag={true}
+        onToggle={toggleItem}
+        onUpdate={updateItem}
+        onDelete={deleteItem}
+        onReorder={(newActiveItems) => {
+          const newItems = [...newActiveItems, ...checkedItems];
+          reorderItems(newItems);
+        }}
+      />
+      <ShoppingItemAddForm onAdd={(values) => addItem(values)} isLoading={isPending} />
 
       {checkedItems.length > 0 && (
-        <div className={classes.listGroup}>
-          <SectionHeader title="completed" />
+        <>
+          <SectionHeader title="completed" mt="xl" />
           <ShoppingItemsList
             items={checkedItems}
             enableDrag={false}
@@ -74,7 +71,7 @@ export const ListDetail = () => {
             onUpdate={updateItem}
             onDelete={deleteItem}
           />
-        </div>
+        </>
       )}
     </Container>
   );
