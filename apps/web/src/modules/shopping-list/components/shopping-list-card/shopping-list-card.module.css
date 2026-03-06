@@ -15,7 +15,17 @@
   margin-bottom: var(--mantine-spacing-sm);
 }
 
+.title {
+  flex: 1;
+}
+
 .meta {
+  margin-top: var(--mantine-spacing-md);
+  padding-top: var(--mantine-spacing-sm);
+  border-top: 1px solid var(--mantine-color-dark-5);
+}
+
+.footer {
   margin-top: var(--mantine-spacing-md);
   padding-top: var(--mantine-spacing-sm);
   border-top: 1px solid var(--mantine-color-dark-5);

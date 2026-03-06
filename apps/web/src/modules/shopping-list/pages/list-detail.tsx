@@ -1,9 +1,12 @@
-import { Button, Group, Skeleton, Stack, Text, Title } from '@mantine/core';
+import { PageHeader } from '@/components/ui/page-header/page-header';
+import { Button, Container, Skeleton, Stack, Text } from '@mantine/core';
+import { IconShare } from '@tabler/icons-react';
 import { useParams } from 'react-router-dom';
 import { AddItemForm } from '../components/add-item-form/add-item-form';
 import { ShoppingItemList } from '../components/shopping-item-list/shopping-item-list';
 import { useShoppingList } from '../hooks/use-shopping-list';
 import classes from './list-detail.module.css';
+import { SectionHeader } from '@/components/ui/section-header/section-header';
 
 export const ListDetail = () => {
   const { listId } = useParams<{ listId: string }>();
@@ -36,15 +39,15 @@ export const ListDetail = () => {
   }
 
   return (
-    <div className={classes.container}>
-      <div className={classes.header}>
-        <Group justify="space-between">
-          <Title order={2}>{list.name}</Title>
-          <Button variant="default" size="xs">
+    <Container size="xl" py="md">
+      <PageHeader
+        title={list.name}
+        actions={
+          <Button leftSection={<IconShare size={18} />} onClick={() => console.log('TODO: share modal')}>
             Share
           </Button>
-        </Group>
-      </div>
+        }
+      />
 
       <div className={classes.listGroup}>
         <ShoppingItemList
@@ -63,7 +66,7 @@ export const ListDetail = () => {
 
       {checkedItems.length > 0 && (
         <div className={classes.listGroup}>
-          <Text className={classes.sectionTitle}>Completed</Text>
+          <SectionHeader title="completed" />
           <ShoppingItemList
             items={checkedItems}
             enableDrag={false}
@@ -73,6 +76,6 @@ export const ListDetail = () => {
           />
         </div>
       )}
-    </div>
+    </Container>
   );
 };

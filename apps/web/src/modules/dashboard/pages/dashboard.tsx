@@ -1,20 +1,21 @@
-import { useState } from 'react';
-import { Title, Text, Group, Button, SimpleGrid, Skeleton, Stack } from '@mantine/core';
+import { apiClient } from '@/api/client';
+import { PageHeader } from '@/components/ui/page-header/page-header';
+import { SectionHeader } from '@/components/ui/section-header/section-header';
+import { CreateListModal } from '@/modules/shopping-list/components/create-list-modal/create-list-modal';
+import { ShoppingListCard } from '@/modules/shopping-list/components/shopping-list-card/shopping-list-card';
+import { Button, Container, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { ShoppingListSchema } from '@repo/common';
 import { IconPlus, IconTemplate } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { ShoppingListSchema } from '@repo/common';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { apiClient } from '@/api/client';
-import { useUser } from '@/modules/auth/hooks/use-user';
-import { CreateListModal } from '../components/create-list-modal/create-list-modal';
-import { DashboardListCard } from '../components/dashboard-list-card/dashboard-list-card';
-import classes from './dashboard.module.css';
 
 type ShoppingList = z.infer<typeof ShoppingListSchema>;
 
 export const Dashboard = () => {
-  const { data: user } = useUser();
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const {
     data: lists,
@@ -27,40 +28,25 @@ export const Dashboard = () => {
     },
   });
 
-  // Determine greeting based on time of day
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning!' : hour < 18 ? 'Good afternoon!' : 'Good evening!';
-
   return (
-    <div className={classes.container}>
-      {/* Hero / Quick Actions */}
-      <div className={classes.heroSection}>
-        <Group justify="space-between" align="flex-end">
-          <div>
-            <Text size="lg" c="dimmed">
-              {greeting},
-            </Text>
-            <Title order={1}>{user?.name || 'User'}</Title>
-          </div>
-          <Group>
-            {/* Future: Template Selector Dropdown */}
-            <Button
-              variant="light"
-              leftSection={<IconTemplate size={18} />}
-              onClick={() => console.log('TODO: Implement template picker')}
-            >
+    <Container size="xl" py="md">
+      <PageHeader
+        title="Dashboard"
+        subtitle="View your lists and create new ones."
+        actions={
+          <>
+            <Button variant="light" leftSection={<IconTemplate size={18} />} onClick={() => navigate('/templates')}>
               Use Template
             </Button>
             <Button leftSection={<IconPlus size={18} />} onClick={() => setCreateModalOpen(true)}>
               New List
             </Button>
-          </Group>
-        </Group>
-      </div>
+          </>
+        }
+      />
 
-      {/* Active Lists Grid */}
       <Stack>
-        <Text className={classes.sectionTitle}>Your Active Lists</Text>
+        <SectionHeader title="Your Active Lists" />
 
         {isLoading ? (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
@@ -73,7 +59,7 @@ export const Dashboard = () => {
         ) : lists && lists.length > 0 ? (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
             {lists.map((list) => (
-              <DashboardListCard key={list.id} list={list} />
+              <ShoppingListCard key={list.id} list={list} />
             ))}
           </SimpleGrid>
         ) : (
@@ -89,6 +75,6 @@ export const Dashboard = () => {
       </Stack>
 
       <CreateListModal opened={createModalOpen} onClose={() => setCreateModalOpen(false)} />
-    </div>
+    </Container>
   );
 };
