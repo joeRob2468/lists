@@ -1,32 +1,17 @@
-import { apiClient } from '@/api/client';
 import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { ShoppingListCard } from '@/modules/shopping-list/components/shopping-list-card/shopping-list-card';
 import { ShoppingListCreateModal } from '@/modules/shopping-list/components/shopping-list-create-modal/shopping-list-create-modal';
-import { Button, Container, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
-import { ShoppingListSchema } from '@repo/common';
-import { IconPlus, IconTemplate } from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
+import { useShoppingLists } from '@/modules/shopping-list/hooks/use-shopping-lists';
+import { Button, Container, Menu, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { IconPencil, IconPlus, IconTemplate, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-
-type ShoppingList = z.infer<typeof ShoppingListSchema>;
 
 export const Dashboard = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const navigate = useNavigate();
-
-  const {
-    data: lists,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['lists', { isTemplate: false }],
-    queryFn: async () => {
-      return apiClient.get('lists', { searchParams: { isTemplate: false } }).json<ShoppingList[]>();
-    },
-  });
+  const { lists, deleteList, isLoading, error } = useShoppingLists({ isTemplate: false });
 
   return (
     <Container size="xl" py="md">
@@ -59,7 +44,27 @@ export const Dashboard = () => {
         ) : lists && lists.length > 0 ? (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
             {lists.map((list) => (
-              <ShoppingListCard key={list.id} list={list} />
+              <ShoppingListCard
+                key={list.id}
+                list={list}
+                menuItems={
+                  <>
+                    <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => navigate(`/lists/${list.id}`)}>
+                      Open List
+                    </Menu.Item>
+                    <Menu.Item
+                      color="red"
+                      leftSection={<IconTrash size={14} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteList(list.id);
+                      }}
+                    >
+                      Delete
+                    </Menu.Item>
+                  </>
+                }
+              />
             ))}
           </SimpleGrid>
         ) : (

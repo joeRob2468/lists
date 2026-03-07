@@ -1,39 +1,17 @@
-import { apiClient } from '@/api/client';
 import { PageHeader } from '@/components/ui/page-header/page-header';
 import { Box, Button, Container, Menu, SimpleGrid, Skeleton, Text, TextInput } from '@mantine/core';
-import type { ShoppingListSchema } from '@repo/common';
 import { IconPencil, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
 import { ShoppingListCard } from '../components/shopping-list-card/shopping-list-card';
 import { ShoppingListCreateModal } from '../components/shopping-list-create-modal/shopping-list-create-modal';
-
-type ShoppingListArray = z.infer<typeof ShoppingListSchema>[];
+import { useShoppingLists } from '../hooks/use-shopping-lists';
 
 export const Lists = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
   const [search, setSearch] = useState('');
   const [createModalOpen, setCreateModalOpen] = useState(false);
-
-  const {
-    data: lists,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['lists', { isTemplate: false }],
-    queryFn: async () => {
-      return apiClient.get('lists', { searchParams: { isTemplate: false } }).json<ShoppingListArray>();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => apiClient.delete(`lists/${id}`).json(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lists'] }),
-  });
+  const { lists, deleteList, isLoading, error } = useShoppingLists({ isTemplate: false });
 
   const filteredLists = lists?.filter((list) => list.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -94,7 +72,7 @@ export const Lists = () => {
                     leftSection={<IconTrash size={14} />}
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteMutation.mutate(list.id);
+                      deleteList(list.id);
                     }}
                   >
                     Delete
