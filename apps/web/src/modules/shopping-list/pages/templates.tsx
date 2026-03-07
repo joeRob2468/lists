@@ -68,7 +68,7 @@ export const Templates = () => {
         <SectionHeader title="Your Active Templates" />
 
         {isLoading ? (
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} height={180} radius="md" />
             ))}
@@ -85,7 +85,7 @@ export const Templates = () => {
             </Button>
           </div>
         ) : (
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
             {templates?.map((template) => (
               <ShoppingListCard
                 key={template.id}

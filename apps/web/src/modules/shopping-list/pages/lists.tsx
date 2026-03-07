@@ -38,7 +38,7 @@ export const Lists = () => {
       </Box>
 
       {isLoading ? (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Skeleton key={i} height={160} radius="md" />
           ))}
@@ -57,7 +57,7 @@ export const Lists = () => {
           )}
         </div>
       ) : (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
           {filteredLists?.map((list) => (
             <ShoppingListCard
               key={list.id}
