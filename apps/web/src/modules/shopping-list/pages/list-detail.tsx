@@ -60,7 +60,11 @@ export const ListDetail = () => {
           reorderItems(newItems);
         }}
       />
-      <ShoppingItemAddForm onAdd={(values) => addItem(values)} isLoading={isPending} />
+      <ShoppingItemAddForm
+        onAdd={(values) => addItem(values)}
+        isLoading={isPending}
+        hideTopBorder={activeItems.length > 0}
+      />
 
       {checkedItems.length > 0 && (
         <>

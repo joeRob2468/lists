@@ -11,9 +11,10 @@ type CreateItemFormValues = z.input<typeof CreateShoppingItemSchema>;
 interface ShoppingItemAddFormProps {
   onAdd: (values: CreateItemFormValues) => void;
   isLoading?: boolean;
+  hideTopBorder?: boolean;
 }
 
-export const ShoppingItemAddForm = ({ onAdd, isLoading }: ShoppingItemAddFormProps) => {
+export const ShoppingItemAddForm = ({ onAdd, isLoading, hideTopBorder = false }: ShoppingItemAddFormProps) => {
   const { register, handleSubmit, reset, getValues } = useForm<CreateItemFormValues>({
     resolver: zodResolver(CreateShoppingItemSchema),
     defaultValues: { name: '', quantity: 1, category: null },
@@ -35,7 +36,11 @@ export const ShoppingItemAddForm = ({ onAdd, isLoading }: ShoppingItemAddFormPro
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} onBlur={handleBlur} className={classes.container}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      onBlur={handleBlur}
+      className={`${classes.container} ${hideTopBorder ? classes.hideTopBorder : ''}`}
+    >
       <div className={classes.iconWrapper}>
         <IconPlus size={20} />
       </div>
