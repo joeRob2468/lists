@@ -4,6 +4,7 @@ import type {
   ShoppingItemSchema,
   ShoppingListWithItemsSchema,
   UpdateShoppingItemSchema,
+  UpdateShoppingListSchema,
 } from '@repo/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -13,6 +14,7 @@ type ShoppingListWithItems = z.infer<typeof ShoppingListWithItemsSchema>;
 type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
 type CreateItemInput = z.input<typeof CreateShoppingItemSchema>;
 type UpdateItemInput = z.input<typeof UpdateShoppingItemSchema>;
+type UpdateListInput = z.input<typeof UpdateShoppingListSchema>;
 
 export const useShoppingList = (listId?: string) => {
   const queryClient = useQueryClient();
@@ -186,6 +188,30 @@ export const useShoppingList = (listId?: string) => {
     },
   });
 
+  const updateListMutation = useMutation({
+    mutationFn: async ({ listId, data }: { listId: string; data: UpdateListInput }) => {
+      if (!listId) return;
+      return apiClient.patch(`lists/${listId}`, { json: data }).json<ShoppingListWithItems>();
+    },
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousList = queryClient.getQueryData<ShoppingListWithItems>(queryKey);
+
+      queryClient.setQueryData<ShoppingListWithItems>(queryKey, (oldData) => {
+        if (!oldData) return oldData;
+        return { ...oldData, ...newData };
+      });
+
+      return { previousList };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousList) {
+        queryClient.setQueryData(queryKey, context.previousList);
+      }
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
   return {
     list,
     items: optimisticItems ?? list?.items ?? [],
@@ -197,5 +223,7 @@ export const useShoppingList = (listId?: string) => {
     updateItem: updateItemMutation.mutate,
     deleteItem: deleteItemMutation.mutate,
     reorderItems: reorderMutation.mutate,
+    updateList: updateListMutation.mutate,
+    isUpdateListPending: updateListMutation.isPending,
   };
 };
