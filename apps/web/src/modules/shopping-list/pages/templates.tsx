@@ -1,44 +1,23 @@
-import { apiClient } from '@/api/client';
 import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
-import { Button, Container, Menu, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { Button, Container, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
 import { ShoppingListSchema } from '@repo/common';
-import { IconCopy, IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { IconCopy, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { ShoppingListCard } from '../components/shopping-list-card/shopping-list-card';
 import {
   ShoppingListCreateModal,
   type ShoppingListCreateModalMode,
 } from '../components/shopping-list-create-modal/shopping-list-create-modal';
-
-type ShoppingListArray = z.infer<typeof ShoppingListSchema>[];
+import { useShoppingLists } from '../hooks/use-shopping-lists';
 
 export const Templates = () => {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ShoppingListCreateModalMode>('create-template');
   const [selectedTemplate, setSelectedTemplate] = useState<{ id: string; name: string } | undefined>(undefined);
 
-  const {
-    data: templates,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['lists', { isTemplate: true }],
-    queryFn: async () => {
-      return apiClient.get('lists', { searchParams: { isTemplate: true } }).json<ShoppingListArray>();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => apiClient.delete(`lists/${id}`).json(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lists', { isTemplate: true }] }),
-  });
+  const { lists: templates, isLoading, error } = useShoppingLists({ isTemplate: true });
 
   const handleUseTemplate = (template: z.infer<typeof ShoppingListSchema>) => {
     setSelectedTemplate(template);
@@ -102,20 +81,6 @@ export const Templates = () => {
                   >
                     Use Template
                   </Button>
-                }
-                menuItems={
-                  <>
-                    <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => navigate(`/lists/${template.id}`)}>
-                      Edit Template
-                    </Menu.Item>
-                    <Menu.Item
-                      leftSection={<IconTrash size={14} />}
-                      color="red"
-                      onClick={() => deleteMutation.mutate(template.id)}
-                    >
-                      Delete
-                    </Menu.Item>
-                  </>
                 }
               />
             ))}

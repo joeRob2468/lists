@@ -1,8 +1,9 @@
 import { ActionIcon, Badge, Card, Group, Menu, Text } from '@mantine/core';
 import { ShoppingListSchema } from '@repo/common';
-import { IconCalendar, IconDots, IconUsers, type ReactNode } from '@tabler/icons-react';
+import { IconCalendar, IconDots, IconPencil, IconTrash, IconUsers, type ReactNode } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { useShoppingLists } from '../../hooks/use-shopping-lists';
 import classes from './shopping-list-card.module.css';
 
 // Infer the type directly from the schema
@@ -12,10 +13,12 @@ interface ShoppingListCardProps {
   list: ShoppingList;
   footer?: ReactNode;
   menuItems?: ReactNode;
+  hideDefaultMenu?: boolean;
 }
 
-export const ShoppingListCard = ({ list, footer, menuItems }: ShoppingListCardProps) => {
+export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = false }: ShoppingListCardProps) => {
   const navigate = useNavigate();
+  const { deleteList } = useShoppingLists();
 
   // Format date: "Jan 14, 2:30 PM"
   const formattedDate = new Intl.DateTimeFormat('en-US', {
@@ -24,6 +27,16 @@ export const ShoppingListCard = ({ list, footer, menuItems }: ShoppingListCardPr
     hour: 'numeric',
     minute: 'numeric',
   }).format(new Date(list.updatedAt));
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    deleteList(list.id);
+  };
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/lists/${list.id}`);
+  };
 
   return (
     <Card
@@ -47,14 +60,28 @@ export const ShoppingListCard = ({ list, footer, menuItems }: ShoppingListCardPr
             </Badge>
           )}
 
-          {menuItems && (
+          {(menuItems || !hideDefaultMenu) && (
             <Menu withinPortal position="bottom-end" shadow="sm">
               <Menu.Target>
                 <ActionIcon variant="subtle" color="gray" onClick={(e) => e.stopPropagation()}>
                   <IconDots size={16} />
                 </ActionIcon>
               </Menu.Target>
-              <Menu.Dropdown>{menuItems}</Menu.Dropdown>
+              <Menu.Dropdown>
+                {!hideDefaultMenu && (
+                  <>
+                    <Menu.Item leftSection={<IconPencil size={14} />} onClick={handleOpen}>
+                      Edit
+                    </Menu.Item>
+                    <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={handleDelete}>
+                      Delete
+                    </Menu.Item>
+                    {menuItems && <Menu.Divider />}
+                  </>
+                )}
+
+                {menuItems}
+              </Menu.Dropdown>
             </Menu>
           )}
         </Group>

@@ -1,17 +1,15 @@
 import { PageHeader } from '@/components/ui/page-header/page-header';
-import { Box, Button, Container, Menu, SimpleGrid, Skeleton, Text, TextInput } from '@mantine/core';
-import { IconPencil, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
+import { Box, Button, Container, SimpleGrid, Skeleton, Text, TextInput } from '@mantine/core';
+import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ShoppingListCard } from '../components/shopping-list-card/shopping-list-card';
 import { ShoppingListCreateModal } from '../components/shopping-list-create-modal/shopping-list-create-modal';
 import { useShoppingLists } from '../hooks/use-shopping-lists';
 
 export const Lists = () => {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const { lists, deleteList, isLoading, error } = useShoppingLists({ isTemplate: false });
+  const { lists, isLoading, error } = useShoppingLists({ isTemplate: false });
 
   const filteredLists = lists?.filter((list) => list.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -62,23 +60,6 @@ export const Lists = () => {
             <ShoppingListCard
               key={list.id}
               list={list}
-              menuItems={
-                <>
-                  <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => navigate(`/lists/${list.id}`)}>
-                    Open List
-                  </Menu.Item>
-                  <Menu.Item
-                    color="red"
-                    leftSection={<IconTrash size={14} />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteList(list.id);
-                    }}
-                  >
-                    Delete
-                  </Menu.Item>
-                </>
-              }
             />
           ))}
         </SimpleGrid>
