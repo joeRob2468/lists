@@ -1,6 +1,7 @@
 .heroSection {
   margin-bottom: var(--mantine-spacing-xl);
   padding-bottom: var(--mantine-spacing-lg);
+  padding-top: var(--mantine-spacing-xl);
   border-bottom: 1px solid var(--mantine-color-dark-5);
 }
 

@@ -1,12 +1,8 @@
 .userButton {
-  display: inline-flex;
-  width: 100%;
-  padding: var(--mantine-spacing-md);
-  color: var(--mantine-color-text);
-  border-radius: var(--mantine-radius-sm);
-  transition: background-color 100ms ease;
+  display: flex;
+  align-items: center;
 }
 
-.userButton:hover {
-  background-color: var(--mantine-color-default-hover);
+.dropdown {
+  padding: var(--mantine-spacing-xs);
 }

@@ -1,40 +1,15 @@
-import { forwardRef } from 'react';
-import { Avatar, Flex, Group, Menu, Text, UnstyledButton, type UnstyledButtonProps } from '@mantine/core';
-import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { IconChevronRight, IconLogout } from '@tabler/icons-react';
 import { apiClient } from '@/api/client';
 import { useUser } from '@/modules/auth/hooks/use-user';
+import { Avatar, Menu, Text, UnstyledButton } from '@mantine/core';
+import { IconLogout } from '@tabler/icons-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import classes from './user-button.module.css';
-
-interface UserButtonInnerProps
-  extends UnstyledButtonProps, Omit<React.ComponentPropsWithoutRef<'button'>, keyof UnstyledButtonProps> {}
-
-const UserButtonInner = forwardRef<HTMLButtonElement, UserButtonInnerProps>((props, ref) => {
-  const { user } = useUser();
-
-  return (
-    <UnstyledButton ref={ref} className={classes.userButton} {...props}>
-      <Group>
-        <Avatar src={user?.picture} radius={'xl'} alt={user?.name}>
-          {user?.name?.charAt(0).toUpperCase()}
-        </Avatar>
-        <Flex direction={'column'}>
-          <Text size="sm" fw={500}>
-            {user?.name}
-          </Text>
-          <Text size="xs">{user?.email}</Text>
-        </Flex>
-
-        <IconChevronRight size={'1.2rem'} stroke={1.5} />
-      </Group>
-    </UnstyledButton>
-  );
-});
 
 export const UserButton = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const handleLogout = async () => {
     await apiClient.post('auth/logout', { json: {} });
@@ -43,12 +18,26 @@ export const UserButton = () => {
   };
 
   return (
-    <Menu withArrow position="right-end" width={200}>
+    <Menu position="bottom-end" shadow="sm" width={200}>
       <Menu.Target>
-        <UserButtonInner />
+        <UnstyledButton className={classes.userButton}>
+          <Avatar src={user?.picture} alt={user?.name} radius="xl" size="md">
+            {user?.name?.charAt(0) || 'U'}
+          </Avatar>
+        </UnstyledButton>
       </Menu.Target>
+
       <Menu.Dropdown>
-        <Menu.Item color="red" leftSection={<IconLogout />} onClick={handleLogout}>
+        <div className={classes.dropdown}>
+          <Text size="sm" fw={500} truncate>
+            {user?.name}
+          </Text>
+          <Text size="xs" c="dimmed" truncate>
+            {user?.email}
+          </Text>
+        </div>
+        <Menu.Divider />
+        <Menu.Item color="red" leftSection={<IconLogout size={14} />} onClick={handleLogout}>
           Logout
         </Menu.Item>
       </Menu.Dropdown>
