@@ -6,7 +6,7 @@ export function useShoppingListMutations() {
 
   const deleteListMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiClient.delete(`lists/${id}`).json();
+      return apiClient.delete(`lists/${id}`, { json: {} }).json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lists'] });
