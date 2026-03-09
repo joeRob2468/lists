@@ -11,7 +11,7 @@ interface UserButtonInnerProps
   extends UnstyledButtonProps, Omit<React.ComponentPropsWithoutRef<'button'>, keyof UnstyledButtonProps> {}
 
 const UserButtonInner = forwardRef<HTMLButtonElement, UserButtonInnerProps>((props, ref) => {
-  const { data: user } = useUser();
+  const { user } = useUser();
 
   return (
     <UnstyledButton ref={ref} className={classes.userButton} {...props}>

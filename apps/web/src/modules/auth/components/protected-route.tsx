@@ -3,7 +3,7 @@ import { useUser } from '../hooks/use-user';
 import { Navigate, Outlet } from 'react-router-dom';
 
 export const ProtectedRoute = () => {
-  const { data: user, isLoading, isError } = useUser();
+  const { user, isLoading, isError } = useUser();
 
   if (isLoading) {
     return <LoadingOverlay overlayProps={{ radius: 'sm', blur: 2 }} visible />;

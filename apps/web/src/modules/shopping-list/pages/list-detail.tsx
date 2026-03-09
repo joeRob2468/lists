@@ -12,7 +12,7 @@ import { useShoppingList } from '../hooks/use-shopping-list';
 
 export const ListDetail = () => {
   const { listId } = useParams<{ listId: string }>();
-  const { data: user } = useUser();
+  const { user } = useUser();
 
   const {
     list,

@@ -20,7 +20,7 @@ interface ShoppingListCardProps {
 export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = false }: ShoppingListCardProps) => {
   const navigate = useNavigate();
   const { deleteList } = useShoppingListMutations();
-  const { data: user } = useUser();
+  const { user } = useUser();
 
   const isOwner = user?.id === list.ownerId;
 

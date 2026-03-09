@@ -3,7 +3,7 @@ import { apiClient } from '@/api/client';
 import { type User } from '@repo/common';
 
 export const useUser = () => {
-  return useQuery({
+  const { data, ...queryRest } = useQuery({
     queryKey: ['user', 'me'],
     queryFn: async () => {
       return await apiClient.get('user/me').json<User>();
@@ -11,4 +11,9 @@ export const useUser = () => {
     retry: false,
     staleTime: 1000 * 60 * 5,
   });
+
+  return {
+    user: data,
+    ...queryRest,
+  };
 };
