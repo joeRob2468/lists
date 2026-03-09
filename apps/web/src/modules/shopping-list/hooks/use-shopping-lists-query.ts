@@ -1,16 +1,15 @@
 import { apiClient } from '@/api/client';
 import { ShoppingListSchema } from '@repo/common';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 
 type ShoppingList = z.infer<typeof ShoppingListSchema>;
 
-interface UseShoppingListsOptions {
+interface UseShoppingListsQueryOptions {
   isTemplate?: boolean;
 }
 
-export function useShoppingLists({ isTemplate }: UseShoppingListsOptions = {}) {
-  const queryClient = useQueryClient();
+export function useShoppingListsQuery({ isTemplate }: UseShoppingListsQueryOptions = {}) {
   const queryKey = ['lists', { isTemplate }];
 
   const {
@@ -29,20 +28,9 @@ export function useShoppingLists({ isTemplate }: UseShoppingListsOptions = {}) {
     },
   });
 
-  const deleteListMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return apiClient.delete(`lists/${id}`).json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lists'] });
-    },
-  });
-
   return {
     lists,
     isLoading,
     error,
-    deleteList: deleteListMutation.mutate,
-    isPending: deleteListMutation.isPending,
   };
 }

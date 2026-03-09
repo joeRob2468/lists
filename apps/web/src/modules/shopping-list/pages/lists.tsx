@@ -4,12 +4,12 @@ import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { useState } from 'react';
 import { ShoppingListCard } from '../components/shopping-list-card/shopping-list-card';
 import { ShoppingListCreateModal } from '../components/shopping-list-create-modal/shopping-list-create-modal';
-import { useShoppingLists } from '../hooks/use-shopping-lists';
+import { useShoppingListsQuery } from '../hooks/use-shopping-lists-query';
 
 export const Lists = () => {
   const [search, setSearch] = useState('');
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const { lists, isLoading, error } = useShoppingLists({ isTemplate: false });
+  const { lists, isLoading, error } = useShoppingListsQuery({ isTemplate: false });
 
   const filteredLists = lists?.filter((list) => list.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -57,10 +57,7 @@ export const Lists = () => {
       ) : (
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
           {filteredLists?.map((list) => (
-            <ShoppingListCard
-              key={list.id}
-              list={list}
-            />
+            <ShoppingListCard key={list.id} list={list} />
           ))}
         </SimpleGrid>
       )}

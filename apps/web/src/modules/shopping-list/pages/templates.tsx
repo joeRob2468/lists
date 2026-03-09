@@ -10,14 +10,14 @@ import {
   ShoppingListCreateModal,
   type ShoppingListCreateModalMode,
 } from '../components/shopping-list-create-modal/shopping-list-create-modal';
-import { useShoppingLists } from '../hooks/use-shopping-lists';
+import { useShoppingListsQuery } from '../hooks/use-shopping-lists-query';
 
 export const Templates = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ShoppingListCreateModalMode>('create-template');
   const [selectedTemplate, setSelectedTemplate] = useState<{ id: string; name: string } | undefined>(undefined);
 
-  const { lists: templates, isLoading, error } = useShoppingLists({ isTemplate: true });
+  const { lists: templates, isLoading, error } = useShoppingListsQuery({ isTemplate: true });
 
   const handleUseTemplate = (template: z.infer<typeof ShoppingListSchema>) => {
     setSelectedTemplate(template);

@@ -3,7 +3,7 @@ import { ShoppingListSchema } from '@repo/common';
 import { IconCalendar, IconDots, IconPencil, IconTrash, IconUsers, type ReactNode } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { useShoppingLists } from '../../hooks/use-shopping-lists';
+import { useShoppingListMutations } from '../../hooks/use-shopping-list-mutations';
 import classes from './shopping-list-card.module.css';
 
 // Infer the type directly from the schema
@@ -18,7 +18,7 @@ interface ShoppingListCardProps {
 
 export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = false }: ShoppingListCardProps) => {
   const navigate = useNavigate();
-  const { deleteList } = useShoppingLists();
+  const { deleteList } = useShoppingListMutations();
 
   // Format date: "Jan 14, 2:30 PM"
   const formattedDate = new Intl.DateTimeFormat('en-US', {

@@ -2,7 +2,7 @@ import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { ShoppingListCard } from '@/modules/shopping-list/components/shopping-list-card/shopping-list-card';
 import { ShoppingListCreateModal } from '@/modules/shopping-list/components/shopping-list-create-modal/shopping-list-create-modal';
-import { useShoppingLists } from '@/modules/shopping-list/hooks/use-shopping-lists';
+import { useShoppingListsQuery } from '@/modules/shopping-list/hooks/use-shopping-lists-query';
 import { Button, Container, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
 import { IconPlus, IconTemplate } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 export const Dashboard = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const navigate = useNavigate();
-  const { lists, isLoading, error } = useShoppingLists({ isTemplate: false });
+  const { lists, isLoading, error } = useShoppingListsQuery({ isTemplate: false });
 
   return (
     <Container size="xl" py="md">
