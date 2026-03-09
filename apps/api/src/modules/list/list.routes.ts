@@ -1,20 +1,20 @@
-import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
-import { eq, and, desc, asc, inArray } from 'drizzle-orm';
+import { sharedListAccess, shoppingItems, shoppingLists } from '@/db/schema';
 import {
   ApiError,
   ApiErrorResponseSchema,
   CreateShoppingItemSchema,
   CreateShoppingListFromTemplateSchema,
   CreateShoppingListSchema,
-  ShoppingListWithItemsSchema,
+  ReorderShoppingItemsSchema,
+  ShoppingItemSchema,
   ShoppingListSchema,
+  ShoppingListWithItemsSchema,
   UpdateShoppingItemSchema,
   UpdateShoppingListSchema,
-  ShoppingItemSchema,
-  ReorderShoppingItemsSchema,
 } from '@repo/common';
-import { shoppingItems, shoppingLists } from '@/db/schema';
+import { and, asc, desc, eq, inArray, ne, or } from 'drizzle-orm';
+import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
 
 export const listModule: FastifyPluginAsyncZod = async (app) => {
   // --- List Endpoints ---
@@ -25,9 +25,13 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
     onRequest: [app.authenticate],
     schema: {
       tags: ['Lists'],
-      summary: 'Get all lists for current user',
+      summary: 'Get all lists for current user, or all shared lists previously accessed by current user',
       querystring: z.object({
         isTemplate: z
+          .enum(['true', 'false'])
+          .transform((value) => value === 'true')
+          .optional(),
+        sharedWithMe: z
           .enum(['true', 'false'])
           .transform((value) => value === 'true')
           .optional(),
@@ -37,7 +41,21 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       },
     },
     handler: async (req) => {
-      const filters = [eq(shoppingLists.ownerId, req.user.id)];
+      const filters = [];
+
+      if (req.query.sharedWithMe) {
+        filters.push(eq(shoppingLists.isShared, true));
+        filters.push(ne(shoppingLists.ownerId, req.user.id));
+
+        // subquery: listId must exist in current user access history
+        const userAccessedLists = app.db
+          .select({ listId: sharedListAccess.listId })
+          .from(sharedListAccess)
+          .where(eq(sharedListAccess.userId, req.user.id));
+        filters.push(inArray(shoppingLists.id, userAccessedLists));
+      } else {
+        filters.push(eq(shoppingLists.ownerId, req.user.id));
+      }
 
       if (typeof req.query.isTemplate === 'boolean') {
         filters.push(eq(shoppingLists.isTemplate, req.query.isTemplate));
@@ -45,7 +63,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
 
       const lists = await app.db.query.shoppingLists.findMany({
         where: and(...filters),
-        orderBy: desc(shoppingLists.createdAt),
+        orderBy: desc(shoppingLists.updatedAt),
       });
 
       return lists;
@@ -82,6 +100,21 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
 
       if (list.ownerId !== req.user.id && !list.isShared) {
         throw new ApiError(403, 'FORBIDDEN', 'You do not have access to this list');
+      }
+
+      // Update access history when guest retrieves list
+      if (list.ownerId !== req.user.id) {
+        await app.db
+          .insert(sharedListAccess)
+          .values({
+            userId: req.user.id,
+            listId: list.id,
+            lastAccessedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: [sharedListAccess.userId, sharedListAccess.listId],
+            set: { lastAccessedAt: new Date() },
+          });
       }
 
       return list;
@@ -238,7 +271,10 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
     },
     handler: async (req, res) => {
       const list = await app.db.query.shoppingLists.findFirst({
-        where: and(eq(shoppingLists.id, req.params.id), eq(shoppingLists.ownerId, req.user.id)),
+        where: and(
+          eq(shoppingLists.id, req.params.id),
+          or(eq(shoppingLists.ownerId, req.user.id), eq(shoppingLists.isShared, true)),
+        ),
       });
 
       if (!list) {
@@ -292,7 +328,10 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
             eq(shoppingItems.listId, req.params.id),
             inArray(
               shoppingItems.listId,
-              app.db.select({ id: shoppingLists.id }).from(shoppingLists).where(eq(shoppingLists.ownerId, req.user.id)),
+              app.db
+                .select({ id: shoppingLists.id })
+                .from(shoppingLists)
+                .where(or(eq(shoppingLists.ownerId, req.user.id), eq(shoppingLists.isShared, true))),
             ),
           ),
         )
@@ -326,7 +365,10 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       const listId = req.params.id;
 
       const list = await app.db.query.shoppingLists.findFirst({
-        where: and(eq(shoppingLists.id, listId), eq(shoppingLists.ownerId, req.user.id)),
+        where: and(
+          eq(shoppingLists.id, listId),
+          or(eq(shoppingLists.ownerId, req.user.id), eq(shoppingLists.isShared, true)),
+        ),
       });
 
       if (!list) {
@@ -375,7 +417,10 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
             eq(shoppingItems.listId, req.params.id),
             inArray(
               shoppingItems.listId,
-              app.db.select({ id: shoppingLists.id }).from(shoppingLists).where(eq(shoppingLists.ownerId, req.user.id)),
+              app.db
+                .select({ id: shoppingLists.id })
+                .from(shoppingLists)
+                .where(or(eq(shoppingLists.ownerId, req.user.id), eq(shoppingLists.isShared, true))),
             ),
           ),
         )

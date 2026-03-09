@@ -1,6 +1,6 @@
 import { User } from '@repo/common';
 import { relations } from 'drizzle-orm';
-import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-zod';
 
 // --- Users ---
@@ -64,3 +64,16 @@ export const shoppingItemsRelations = relations(shoppingItems, ({ one }) => ({
     references: [shoppingLists.id],
   }),
 }));
+
+// --- Shared Shopping List Access History ---
+export const sharedListAccess = pgTable(
+  'shared_list_access',
+  {
+    userId: uuid('user_id').notNull(),
+    listId: uuid('list_id')
+      .notNull()
+      .references(() => shoppingLists.id, { onDelete: 'cascade' }),
+    lastAccessedAt: timestamp('last_accessed_at').defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.listId] })],
+);
