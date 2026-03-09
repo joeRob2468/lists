@@ -1,6 +1,6 @@
 import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
-import { Button, Container, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { Button, Container, SimpleGrid, Skeleton, Text } from '@mantine/core';
 import { ShoppingListSchema } from '@repo/common';
 import { IconCopy, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -17,7 +17,11 @@ export const Templates = () => {
   const [modalMode, setModalMode] = useState<ShoppingListCreateModalMode>('create-template');
   const [selectedTemplate, setSelectedTemplate] = useState<{ id: string; name: string } | undefined>(undefined);
 
-  const { lists: templates, isLoading, error } = useShoppingListsQuery({ isTemplate: true });
+  const { lists: templatesOwned, isLoading: isLoadingOwned } = useShoppingListsQuery({ isTemplate: true });
+  const { lists: templatesShared, isLoading: isLoadingShared } = useShoppingListsQuery({
+    isTemplate: true,
+    sharedWithMe: true,
+  });
 
   const handleUseTemplate = (template: z.infer<typeof ShoppingListSchema>) => {
     setSelectedTemplate(template);
@@ -43,29 +47,26 @@ export const Templates = () => {
         }
       />
 
-      <Stack>
-        <SectionHeader title="Your Active Templates" />
-
-        {isLoading ? (
+      <SectionHeader title="My Templates" />
+      {isLoadingOwned ? (
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} height={160} radius="md" />
+          ))}
+        </SimpleGrid>
+      ) : templatesOwned?.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <Text c="dimmed" mb="md">
+            You don't have any active templates.
+          </Text>
+          <Button variant="outline" onClick={() => setModalOpen(true)}>
+            Create your first template
+          </Button>
+        </div>
+      ) : (
+        <>
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} height={180} radius="md" />
-            ))}
-          </SimpleGrid>
-        ) : error ? (
-          <Text c="red">Failed to load templates</Text>
-        ) : templates?.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Text c="dimmed" mb="md">
-              You don't have any active templates.
-            </Text>
-            <Button variant="outline" onClick={() => setModalOpen(true)}>
-              Create your first template
-            </Button>
-          </div>
-        ) : (
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-            {templates?.map((template) => (
+            {templatesOwned?.map((template) => (
               <ShoppingListCard
                 key={template.id}
                 list={template}
@@ -85,8 +86,43 @@ export const Templates = () => {
               />
             ))}
           </SimpleGrid>
-        )}
-      </Stack>
+        </>
+      )}
+
+      <SectionHeader title="Shared With Me" mt="xl" />
+      {isLoadingShared ? (
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} height={160} radius="md" />
+          ))}
+        </SimpleGrid>
+      ) : templatesShared?.length === 0 ? (
+        <Text c="dimmed" size="lg" mb="md">
+          {'Nobody has shared any templates with you yet.'}
+        </Text>
+      ) : (
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+          {templatesShared?.map((template) => (
+            <ShoppingListCard
+              key={template.id}
+              list={template}
+              footer={
+                <Button
+                  fullWidth
+                  variant="light"
+                  leftSection={<IconCopy size={16} />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUseTemplate(template);
+                  }}
+                >
+                  Use Template
+                </Button>
+              }
+            />
+          ))}
+        </SimpleGrid>
+      )}
 
       <ShoppingListCreateModal
         opened={modalOpen}

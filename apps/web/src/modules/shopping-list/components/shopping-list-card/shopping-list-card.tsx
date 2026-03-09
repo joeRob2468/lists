@@ -1,3 +1,4 @@
+import { useUser } from '@/modules/auth/hooks/use-user';
 import { ActionIcon, Badge, Card, Group, Menu, Text } from '@mantine/core';
 import { ShoppingListSchema } from '@repo/common';
 import { IconCalendar, IconDots, IconPencil, IconTrash, IconUsers, type ReactNode } from '@tabler/icons-react';
@@ -19,6 +20,9 @@ interface ShoppingListCardProps {
 export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = false }: ShoppingListCardProps) => {
   const navigate = useNavigate();
   const { deleteList } = useShoppingListMutations();
+  const { data: user } = useUser();
+
+  const isOwner = user?.id === list.ownerId;
 
   // Format date: "Jan 14, 2:30 PM"
   const formattedDate = new Intl.DateTimeFormat('en-US', {
@@ -73,9 +77,11 @@ export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = fa
                     <Menu.Item leftSection={<IconPencil size={14} />} onClick={handleOpen}>
                       Edit
                     </Menu.Item>
-                    <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={handleDelete}>
-                      Delete
-                    </Menu.Item>
+                    {isOwner && (
+                      <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={handleDelete}>
+                        Delete
+                      </Menu.Item>
+                    )}
                     {menuItems && <Menu.Divider />}
                   </>
                 )}

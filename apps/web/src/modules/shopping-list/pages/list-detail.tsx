@@ -1,5 +1,6 @@
 import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
+import { useUser } from '@/modules/auth/hooks/use-user';
 import { Button, Container, Skeleton, Stack, Text } from '@mantine/core';
 import { IconShare } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -11,6 +12,8 @@ import { useShoppingList } from '../hooks/use-shopping-list';
 
 export const ListDetail = () => {
   const { listId } = useParams<{ listId: string }>();
+  const { data: user } = useUser();
+
   const {
     list,
     items,
@@ -53,16 +56,24 @@ export const ListDetail = () => {
     );
   }
 
+  const isOwner = user?.id === list.ownerId;
+
   return (
     <>
       <Container size="xl" py="md">
         <PageHeader
           title={list.name}
-          subtitle="Add, reorder, or remove items from your list."
+          subtitle={
+            isOwner
+              ? 'Add, reorder, or remove items from your list.'
+              : 'This is a shared list - you can add and check off items.'
+          }
           actions={
-            <Button leftSection={<IconShare size={18} />} onClick={() => setShareModalOpen(true)}>
-              Share
-            </Button>
+            isOwner && (
+              <Button leftSection={<IconShare size={18} />} onClick={() => setShareModalOpen(true)}>
+                Share
+              </Button>
+            )
           }
         />
 
@@ -97,14 +108,16 @@ export const ListDetail = () => {
         )}
       </Container>
 
-      <ShareListModal
-        opened={shareModalOpen}
-        onClose={() => setShareModalOpen(false)}
-        listId={list.id}
-        isShared={list.isShared}
-        onToggleShare={(isShared) => updateList({ listId: list.id, data: { isShared } })}
-        isLoading={isUpdateListPending}
-      />
+      {isOwner && (
+        <ShareListModal
+          opened={shareModalOpen}
+          onClose={() => setShareModalOpen(false)}
+          listId={list.id}
+          isShared={list.isShared}
+          onToggleShare={(isShared) => updateList({ listId: list.id, data: { isShared } })}
+          isLoading={isUpdateListPending}
+        />
+      )}
     </>
   );
 };

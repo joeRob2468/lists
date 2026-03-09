@@ -5,13 +5,19 @@ import { useState } from 'react';
 import { ShoppingListCard } from '../components/shopping-list-card/shopping-list-card';
 import { ShoppingListCreateModal } from '../components/shopping-list-create-modal/shopping-list-create-modal';
 import { useShoppingListsQuery } from '../hooks/use-shopping-lists-query';
+import { SectionHeader } from '@/components/ui/section-header/section-header';
 
 export const Lists = () => {
   const [search, setSearch] = useState('');
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const { lists, isLoading, error } = useShoppingListsQuery({ isTemplate: false });
+  const { lists: listsOwned, isLoading: isLoadingOwned } = useShoppingListsQuery({ isTemplate: false });
+  const { lists: listsShared, isLoading: isLoadingShared } = useShoppingListsQuery({
+    isTemplate: false,
+    sharedWithMe: true,
+  });
 
-  const filteredLists = lists?.filter((list) => list.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredListsOwned = listsOwned?.filter((list) => list.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredListsShared = listsShared?.filter((list) => list.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <Container size="xl" py="md">
@@ -35,28 +41,41 @@ export const Lists = () => {
         />
       </Box>
 
-      {isLoading ? (
+      <SectionHeader title="My Lists" />
+      {isLoadingOwned ? (
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Skeleton key={i} height={160} radius="md" />
           ))}
         </SimpleGrid>
-      ) : error ? (
-        <Text c="red">Failed to load lists.</Text>
-      ) : filteredLists?.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 0' }}>
-          <Text c="dimmed" size="lg" mb="md">
-            {search ? `No lists found matching "${search}"` : "You don't have any lists yet."}
-          </Text>
-          {!search && (
-            <Button variant="outline" onClick={() => setCreateModalOpen(true)}>
-              Create your first list
-            </Button>
-          )}
-        </div>
+      ) : filteredListsOwned?.length === 0 ? (
+        <Text c="dimmed" size="lg" mb="md">
+          {search ? `No lists found matching "${search}"` : "You don't have any lists yet."}
+        </Text>
+      ) : (
+        <>
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+            {filteredListsOwned?.map((list) => (
+              <ShoppingListCard key={list.id} list={list} />
+            ))}
+          </SimpleGrid>
+        </>
+      )}
+
+      <SectionHeader title="Shared With Me" mt="xl" />
+      {isLoadingShared ? (
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} height={160} radius="md" />
+          ))}
+        </SimpleGrid>
+      ) : filteredListsShared?.length === 0 ? (
+        <Text c="dimmed" size="lg" mb="md">
+          {search ? `No shared lists found matching "${search}"` : 'Nobody has shared any lists with you yet.'}
+        </Text>
       ) : (
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {filteredLists?.map((list) => (
+          {filteredListsShared?.map((list) => (
             <ShoppingListCard key={list.id} list={list} />
           ))}
         </SimpleGrid>
