@@ -9,6 +9,7 @@ import type {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
+import { useRealtimeList } from './use-realtime-list';
 
 type ShoppingListWithItems = z.infer<typeof ShoppingListWithItemsSchema>;
 type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
@@ -20,6 +21,7 @@ export const useShoppingList = (listId?: string) => {
   const queryClient = useQueryClient();
   const queryKey = ['list', listId];
   const [optimisticItems, setOptimisticItems] = useState<ShoppingItem[] | null>(null);
+  useRealtimeList(listId);
 
   const {
     data: list,
