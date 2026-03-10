@@ -11,6 +11,7 @@ import {
   ShoppingListWithItemsSchema,
   UpdateShoppingItemSchema,
   UpdateShoppingListSchema,
+  WsClientMessageSchema,
 } from '@repo/common';
 import { and, asc, desc, eq, inArray, ne, or } from 'drizzle-orm';
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
@@ -226,6 +227,8 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       if (!updated) {
         throw new ApiError(404, 'NOT_FOUND', 'List not found');
       }
+
+      app.broadcastToList(req.params.id, 'list_updated');
       return updated;
     },
   });
@@ -301,6 +304,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
 
       await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, list.id));
 
+      app.broadcastToList(req.params.id, 'list_updated');
       res.status(201);
       return item;
     },
@@ -343,6 +347,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
 
       await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, req.params.id));
 
+      app.broadcastToList(req.params.id, 'list_updated');
       return updated;
     },
   });
@@ -393,6 +398,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         orderBy: asc(shoppingItems.position),
       });
 
+      app.broadcastToList(req.params.id, 'list_updated');
       return updatedItems;
     },
   });
@@ -432,7 +438,74 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
 
       await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, req.params.id));
 
+      app.broadcastToList(req.params.id, 'list_updated');
       res.status(204).send(null);
+    },
+  });
+
+  // --- Websocket Endpoints ---
+
+  app.route({
+    method: 'GET',
+    url: '/ws',
+    schema: {
+      tags: ['Realtime'],
+      summary: 'WebSocket connection for live list updates',
+      description: `
+Establish a WebSocket connection to receive real-time updates for shopping lists. 
+Since this is a WebSocket upgrade endpoint, you cannot test it directly via the Swagger UI "Try it out" button.
+
+### Sending Messages (Client -> Server)
+To listen for changes on a specific list, send a JSON string matching the \`WsClientMessage\` schema:
+\`\`\`json
+{
+  "action": "join",
+  "listId": "123e4567-e89b-12d3-a456-426614174000"
+}
+\`\`\`
+
+### Receiving Messages (Server -> Client)
+When someone modifies a list you are subscribed to, the server will emit a JSON string matching the \`WsServerEvent\` schema:
+\`\`\`json
+{
+  "event": "list_updated"
+}
+\`\`\`
+The client should respond to this event by triggering a background refetch of the list data.
+        `,
+    },
+    wsHandler: (socket, _req) => {
+      // const socket = connection.socket;
+      let currentListId: string | null = null;
+
+      socket.on('message', (message: string | Buffer) => {
+        try {
+          const rawData = JSON.parse(message.toString());
+          const parsed = WsClientMessageSchema.safeParse(rawData);
+          if (!parsed.success) return;
+
+          const data = parsed.data;
+          if (data.action === 'join') {
+            if (currentListId) {
+              app.unsubscribeFromList(currentListId, socket);
+            }
+
+            currentListId = data.listId;
+            app.subscribeToList(currentListId, socket);
+          }
+        } catch {
+          // ignore malformed JSON payloads.
+        }
+      });
+
+      socket.on('close', () => {
+        if (currentListId) {
+          app.unsubscribeFromList(currentListId, socket);
+        }
+      });
+    },
+    handler: async (_req, res) => {
+      return res.status(426).send('Upgrade Required');
     },
   });
 };

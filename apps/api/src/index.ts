@@ -13,6 +13,7 @@ import authPlugin from '@/plugins/auth';
 import errorHandlerPlugin from '@/plugins/error-handler';
 import corsPlugin from '@/plugins/cors';
 import helmetPlugin from '@/plugins/helmet';
+import websocketPlugin from '@/plugins/websocket';
 import { userModule } from '@/modules/user/user.routes';
 import { authModule } from '@/modules/auth/auth.routes';
 import { listModule } from '@/modules/list/list.routes';
@@ -48,6 +49,7 @@ const start = async () => {
     await app.register(corsPlugin);
     await app.register(helmetPlugin);
     await app.register(authPlugin);
+    await app.register(websocketPlugin);
 
     await app.register(authModule, { prefix: '/auth' });
     await app.register(userModule, { prefix: '/user' });
