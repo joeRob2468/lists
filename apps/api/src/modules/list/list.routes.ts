@@ -36,6 +36,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
           .enum(['true', 'false'])
           .transform((value) => value === 'true')
           .optional(),
+        limit: z.coerce.number().min(1).max(50).optional(),
       }),
       response: {
         200: z.array(ShoppingListSchema),
@@ -43,6 +44,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
     },
     handler: async (req) => {
       const filters = [];
+      const limit = req.query.limit;
 
       if (req.query.sharedWithMe) {
         filters.push(eq(shoppingLists.isShared, true));
@@ -65,6 +67,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       const lists = await app.db.query.shoppingLists.findMany({
         where: and(...filters),
         orderBy: desc(shoppingLists.updatedAt),
+        limit,
       });
 
       return lists;
