@@ -55,14 +55,9 @@ export const Templates = () => {
           ))}
         </SimpleGrid>
       ) : templatesOwned?.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <Text c="dimmed" mb="md">
-            You don't have any active templates.
-          </Text>
-          <Button variant="outline" onClick={() => setModalOpen(true)}>
-            Create your first template
-          </Button>
-        </div>
+        <Text c="dimmed" mb="md">
+          You don't have any active templates.
+        </Text>
       ) : (
         <>
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
