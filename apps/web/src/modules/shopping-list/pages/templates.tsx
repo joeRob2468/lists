@@ -97,7 +97,7 @@ export const Templates = () => {
           ))}
         </SimpleGrid>
       ) : templatesShared?.length === 0 ? (
-        <Text c="dimmed" size="lg" mb="md">
+        <Text c="dimmed" mb="md">
           {'Nobody has shared any templates with you yet.'}
         </Text>
       ) : (
