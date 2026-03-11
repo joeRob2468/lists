@@ -1,4 +1,11 @@
 import { lazy } from 'react';
+import type { RouteSEO } from './seo.config';
+
+export interface AppRoute {
+  path: string;
+  element: React.ReactNode;
+  seo?: RouteSEO;
+}
 
 const Landing = lazy(() =>
   import('@/modules/landing/pages/landing').then((m) => ({
@@ -27,11 +34,11 @@ const ListDetail = lazy(() =>
   })),
 );
 
-export const PUBLIC_ROUTES = [{ path: '/', element: <Landing /> }];
+export const PUBLIC_ROUTES: AppRoute[] = [{ path: '/', element: <Landing /> }];
 
-export const PRIVATE_ROUTES = [
-  { path: '/dashboard', element: <Dashboard /> },
-  { path: '/templates', element: <Templates /> },
-  { path: '/lists', element: <Lists /> },
+export const PRIVATE_ROUTES: AppRoute[] = [
+  { path: '/dashboard', element: <Dashboard />, seo: { title: 'Dashboard' } },
+  { path: '/templates', element: <Templates />, seo: { title: 'Templates' } },
+  { path: '/lists', element: <Lists />, seo: { title: 'My Lists' } },
   { path: '/lists/:listId', element: <ListDetail /> },
 ];

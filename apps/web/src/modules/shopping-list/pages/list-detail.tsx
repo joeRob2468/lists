@@ -1,5 +1,6 @@
 import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
+import { SEO } from '@/components/ui/seo/seo';
 import { useUser } from '@/modules/auth/hooks/use-user';
 import { Button, Container, Skeleton, Stack, Text } from '@mantine/core';
 import { IconShare } from '@tabler/icons-react';
@@ -60,6 +61,7 @@ export const ListDetail = () => {
 
   return (
     <>
+      <SEO title={list.name} description={`Collaborate on the ${list.name} shopping list.`} />
       <Container size="xl" py="md">
         <PageHeader
           title={list.name}

@@ -1,10 +1,11 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { AppProvider } from '@/providers/app-provider';
-import { ProtectedRoute } from '@/modules/auth/components/protected-route';
 import { AppLayout } from '@/components/layout/app-layout/app-layout';
+import { SEO } from '@/components/ui/seo/seo';
 import { PRIVATE_ROUTES, PUBLIC_ROUTES } from '@/config/routes.config';
-import { Suspense } from 'react';
+import { ProtectedRoute } from '@/modules/auth/components/protected-route';
+import { AppProvider } from '@/providers/app-provider';
 import { LoadingOverlay } from '@mantine/core';
+import { Suspense } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 function App() {
   return (
@@ -17,9 +18,12 @@ function App() {
               key={route.path}
               path={route.path}
               element={
-                <Suspense fallback={<LoadingOverlay overlayProps={{ radius: 'sm', blur: 2 }} visible />}>
-                  {route.element}
-                </Suspense>
+                <>
+                  <SEO seo={route.seo} />
+                  <Suspense fallback={<LoadingOverlay overlayProps={{ radius: 'sm', blur: 2 }} visible />}>
+                    {route.element}
+                  </Suspense>
+                </>
               }
             />
           ))}
@@ -32,9 +36,12 @@ function App() {
                   key={route.path}
                   path={route.path}
                   element={
-                    <Suspense fallback={<LoadingOverlay overlayProps={{ radius: 'sm', blur: 2 }} visible />}>
-                      {route.element}
-                    </Suspense>
+                    <>
+                      <SEO seo={route.seo} />
+                      <Suspense fallback={<LoadingOverlay overlayProps={{ radius: 'sm', blur: 2 }} visible />}>
+                        {route.element}
+                      </Suspense>
+                    </>
                   }
                 />
               ))}

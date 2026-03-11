@@ -1,8 +1,9 @@
 import { createTheme, MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { type ReactNode } from 'react';
-import '@mantine/core/styles.css';
+import { HelmetProvider } from 'react-helmet-async';
 
 const theme = createTheme({
   primaryColor: 'blue',
@@ -19,11 +20,13 @@ const queryClient = new QueryClient({
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <MantineProvider theme={theme} defaultColorScheme="dark">
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </MantineProvider>
+    <HelmetProvider>
+      <MantineProvider theme={theme} defaultColorScheme="dark">
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </MantineProvider>
+    </HelmetProvider>
   );
 };
