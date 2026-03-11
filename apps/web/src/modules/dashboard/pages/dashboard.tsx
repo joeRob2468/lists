@@ -19,15 +19,23 @@ export const Dashboard = () => {
   const [modalMode, setModalMode] = useState<ShoppingListCreateModalMode>('create-list');
   const [selectedTemplate, setSelectedTemplate] = useState<{ id: string; name: string } | undefined>(undefined);
 
-  const { lists: listsOwned, isLoading: isLoadingOwned } = useShoppingListsQuery({ isTemplate: false });
+  const { lists: listsOwned, isLoading: isLoadingOwned } = useShoppingListsQuery({
+    isTemplate: false,
+    limit: 6,
+  });
   const { lists: listsShared, isLoading: isLoadingShared } = useShoppingListsQuery({
     isTemplate: false,
     sharedWithMe: true,
+    limit: 6,
   });
-  const { lists: templatesOwned, isLoading: isLoadingTemplatesOwned } = useShoppingListsQuery({ isTemplate: true });
+  const { lists: templatesOwned, isLoading: isLoadingTemplatesOwned } = useShoppingListsQuery({
+    isTemplate: true,
+    limit: 6,
+  });
   const { lists: templatesShared, isLoading: isLoadingTemplatesShared } = useShoppingListsQuery({
     isTemplate: true,
     sharedWithMe: true,
+    limit: 6,
   });
 
   const handleUseTemplate = (template: z.infer<typeof ShoppingListSchema>) => {

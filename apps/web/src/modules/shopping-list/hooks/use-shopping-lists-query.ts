@@ -8,10 +8,11 @@ type ShoppingList = z.infer<typeof ShoppingListSchema>;
 interface UseShoppingListsQueryOptions {
   isTemplate?: boolean;
   sharedWithMe?: boolean;
+  limit?: number;
 }
 
-export function useShoppingListsQuery({ isTemplate, sharedWithMe }: UseShoppingListsQueryOptions = {}) {
-  const queryKey = ['lists', { isTemplate, sharedWithMe }];
+export function useShoppingListsQuery({ isTemplate, sharedWithMe, limit }: UseShoppingListsQueryOptions = {}) {
+  const queryKey = ['lists', { isTemplate, sharedWithMe, limit }];
 
   const {
     data: lists,
@@ -23,6 +24,7 @@ export function useShoppingListsQuery({ isTemplate, sharedWithMe }: UseShoppingL
       const searchParams: Record<string, string> = {};
       if (typeof isTemplate === 'boolean') searchParams.isTemplate = String(isTemplate);
       if (typeof sharedWithMe === 'boolean') searchParams.sharedWithMe = String(sharedWithMe);
+      if (limit) searchParams.limit = String(limit);
 
       return apiClient.get('lists', { searchParams }).json<ShoppingList[]>();
     },
