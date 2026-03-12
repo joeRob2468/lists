@@ -2,9 +2,9 @@ import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { SEO } from '@/components/ui/seo/seo';
 import { useUser } from '@/modules/auth/hooks/use-user';
-import { Button, Container, Group, Skeleton, Stack, Text } from '@mantine/core';
+import { Button, Container, Group, Skeleton, Stack, Text, Textarea, Title } from '@mantine/core';
 import { IconCopy, IconShare } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShoppingItemAddForm } from '../components/shopping-item-add-form/shopping-item-add-form';
 import { ShoppingItemsList } from '../components/shopping-items-list/shopping-items-list';
@@ -37,6 +37,26 @@ export const ListDetail = () => {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
 
+  const [nameValue, setNameValue] = useState(list?.name);
+
+  useEffect(() => {
+    if (list && !isUpdateListPending) {
+      // I'm aware that this causes a second render (one for prop change, one for state update),
+      // but the performance impact is acceptable to me in this case.
+      setNameValue(list.name); // eslint-disable-line
+    }
+  }, [list, isUpdateListPending]);
+
+  const handleNameSubmit = () => {
+    if (!list) return;
+    const trimmed = nameValue ? nameValue.trim() : '';
+    if (trimmed.length === 0) {
+      setNameValue(list.name);
+    } else if (trimmed !== list.name) {
+      updateList({ listId: list.id, data: { name: trimmed } });
+    }
+  };
+
   if (isLoading) {
     return (
       <Container size="xl" py="md">
@@ -60,12 +80,43 @@ export const ListDetail = () => {
 
   const isOwner = user?.id === list.ownerId;
 
+  const titleElement = isOwner ? (
+    <Textarea
+      variant="unstyled"
+      value={nameValue}
+      onChange={(e) => setNameValue(e.currentTarget.value)}
+      onBlur={handleNameSubmit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.currentTarget.blur();
+        }
+      }}
+      autosize
+      minRows={1}
+      styles={{
+        input: {
+          fontSize: 'var(--mantine-h1-font-size)',
+          fontWeight: 'var(--mantine-h1-font-weight)',
+          lineHeight: 'var(--mantine-h1-line-height)',
+          fontFamily: 'var(--mantine-font-family-headings)',
+          height: 'auto',
+          padding: 0,
+          overflow: 'hidden',
+          wordBreak: 'break-word',
+        },
+      }}
+    />
+  ) : (
+    <Title order={1}>{list.name}</Title>
+  );
+
   return (
     <>
       <SEO title={list.name} description={`Collaborate on the ${list.name} shopping list.`} />
       <Container size="xl" py="md">
         <PageHeader
-          title={list.name}
+          title={titleElement}
           subtitle={
             isOwner
               ? 'Add, reorder, or remove items from your list.'

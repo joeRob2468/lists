@@ -8,4 +8,11 @@
 .titleWrapper {
   display: flex;
   flex-direction: column;
+  flex: 1;
+}
+
+@mixin smaller-than $mantine-breakpoint-sm {
+  .titleWrapper {
+    min-width: 100%;
+  }
 }
