@@ -91,10 +91,7 @@ export const ShoppingListCreateModal = ({
 
       reset();
       onClose();
-
-      if (mode !== 'save-as-template') {
-        navigate(`/lists/${newList.id}`);
-      }
+      navigate(`/lists/${newList.id}`);
     },
     onError: () => {
       notifications.show({
