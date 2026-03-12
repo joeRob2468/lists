@@ -16,6 +16,7 @@ import {
 import { and, asc, desc, eq, inArray, ne, or } from 'drizzle-orm';
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { SaveListAsTemplateSchema } from '../../../../../packages/common/src/schemas/shopping-list.schemas';
 
 export const listModule: FastifyPluginAsyncZod = async (app) => {
   // --- List Endpoints ---
@@ -205,6 +206,63 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
 
       res.status(201);
       return fullList;
+    },
+  });
+
+  app.route({
+    method: 'POST',
+    url: '/save-as-template',
+    onRequest: [app.authenticate],
+    schema: {
+      tags: ['Lists'],
+      summary: 'Save an existing list as a new reusable template',
+      body: SaveListAsTemplateSchema,
+      response: {
+        201: ShoppingListWithItemsSchema,
+        404: ApiErrorResponseSchema,
+      },
+    },
+    handler: async (req, res) => {
+      const { listId, newName } = req.body;
+
+      const sourceList = await app.db.query.shoppingLists.findFirst({
+        where: eq(shoppingLists.id, listId),
+        with: { items: true },
+      });
+
+      if (!sourceList) {
+        throw new ApiError(404, 'NOT_FOUND', 'Source list not found');
+      }
+
+      const [newTemplate] = await app.db
+        .insert(shoppingLists)
+        .values({
+          name: newName || `${sourceList.name} Template`,
+          ownerId: req.user.id,
+          isTemplate: true,
+        })
+        .returning();
+
+      if (sourceList.items.length > 0) {
+        await app.db.insert(shoppingItems).values(
+          sourceList.items.map((item) => ({
+            listId: newTemplate.id,
+            name: item.name,
+            category: item.category,
+            quantity: item.quantity,
+            isChecked: false, // Reset item checked state
+            position: item.position,
+          })),
+        );
+      }
+
+      const fullTemplate = await app.db.query.shoppingLists.findFirst({
+        where: eq(shoppingLists.id, newTemplate.id),
+        with: { items: { orderBy: asc(shoppingItems.position) } },
+      });
+
+      res.status(201);
+      return fullTemplate;
     },
   });
 
