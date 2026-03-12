@@ -1,7 +1,7 @@
 .heroSection {
   margin-bottom: var(--mantine-spacing-xl);
   padding-bottom: var(--mantine-spacing-lg);
-  padding-top: var(--mantine-spacing-xl);
+  padding-top: var(--mantine-spacing-lg);
   border-bottom: 1px solid var(--mantine-color-dark-5);
 }
 
@@ -15,4 +15,9 @@
   .titleWrapper {
     min-width: 100%;
   }
+}
+
+.badgesWrapper {
+  min-height: 22px;
+  margin-bottom: var(--mantine-spacing-xs);
 }

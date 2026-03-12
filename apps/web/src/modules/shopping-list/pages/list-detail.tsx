@@ -2,8 +2,8 @@ import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { SEO } from '@/components/ui/seo/seo';
 import { useUser } from '@/modules/auth/hooks/use-user';
-import { Button, Container, Group, Skeleton, Stack, Text, Textarea, Title } from '@mantine/core';
-import { IconCopy, IconShare } from '@tabler/icons-react';
+import { Badge, Button, Container, Group, Skeleton, Stack, Text, Textarea, Title } from '@mantine/core';
+import { IconCopy, IconShare, IconTemplate, IconUsers } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShoppingItemAddForm } from '../components/shopping-item-add-form/shopping-item-add-form';
@@ -121,6 +121,20 @@ export const ListDetail = () => {
             isOwner
               ? 'Add, reorder, or remove items from your list.'
               : 'This is a shared list - you can add and check off items.'
+          }
+          badges={
+            <Group gap="xs">
+              {list.isShared && (
+                <Badge variant="light" leftSection={<IconUsers size={12} />}>
+                  Shared
+                </Badge>
+              )}
+              {list.isTemplate && (
+                <Badge variant="light" leftSection={<IconTemplate size={12} />}>
+                  Template
+                </Badge>
+              )}
+            </Group>
           }
           actions={
             <Group>
