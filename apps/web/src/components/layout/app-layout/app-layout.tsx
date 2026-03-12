@@ -1,6 +1,6 @@
 import { NAV_LINKS } from '@/config/navigation.config';
 import { UserButton } from '@/modules/auth/components/user-button/user-button';
-import { AppShell, Burger, Button, Container, Group, NavLink, Title } from '@mantine/core';
+import { AppShell, Burger, Button, Container, Group, Image, NavLink, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -56,9 +56,12 @@ export const AppLayout = () => {
             <Group>
               <Burger opened={opened} onClick={toggle} hiddenFrom="md" size="sm" />
 
-              <Title order={3} style={{ cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
-                Shopping List
-              </Title>
+              <Group gap="sm" style={{ cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
+                <Image src="/logo.svg" h={30} w={30} />
+                <Title order={3} size="md" style={{ color: '#FFFFFF' }}>
+                  Lists
+                </Title>
+              </Group>
 
               <Group ml="xl" gap="sm" visibleFrom="md">
                 {desktopLinks}
