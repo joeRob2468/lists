@@ -93,95 +93,105 @@ export const Dashboard = () => {
         </>
       )}
 
-      <SectionHeader title="Shared Lists" mt="xl" />
       {isLoadingShared ? (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} height={160} radius="md" />
-          ))}
-        </SimpleGrid>
-      ) : listsShared?.length === 0 ? (
-        <Text c="dimmed" mb="md">
-          {'Nobody has shared any lists with you yet.'}
-        </Text>
-      ) : (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {listsShared?.map((list) => (
-            <ShoppingListCard key={list.id} list={list} />
-          ))}
-        </SimpleGrid>
-      )}
-
-      <SectionHeader title="My Templates" mt="xl" />
-      {isLoadingTemplatesOwned ? (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} height={160} radius="md" />
-          ))}
-        </SimpleGrid>
-      ) : templatesOwned?.length === 0 ? (
-        <Text c="dimmed" mb="md">
-          You don't have any active templates.
-        </Text>
-      ) : (
         <>
+          <SectionHeader title="Shared Lists" mt="xl" />
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-            {templatesOwned?.map((template) => (
-              <ShoppingListCard
-                key={template.id}
-                list={template}
-                footer={
-                  <Button
-                    fullWidth
-                    variant="light"
-                    leftSection={<IconCopy size={16} />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleUseTemplate(template);
-                    }}
-                  >
-                    Use Template
-                  </Button>
-                }
-              />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} height={160} radius="md" />
             ))}
           </SimpleGrid>
         </>
+      ) : (
+        listsShared &&
+        listsShared.length > 0 && (
+          <>
+            <SectionHeader title="Shared Lists" mt="xl" />
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+              {listsShared?.map((list) => (
+                <ShoppingListCard key={list.id} list={list} />
+              ))}
+            </SimpleGrid>
+          </>
+        )
       )}
 
-      <SectionHeader title="Shared Templates" mt="xl" />
-      {isLoadingTemplatesShared ? (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} height={160} radius="md" />
-          ))}
-        </SimpleGrid>
-      ) : templatesShared?.length === 0 ? (
-        <Text c="dimmed" mb="md">
-          {'Nobody has shared any templates with you yet.'}
-        </Text>
+      {isLoadingTemplatesOwned ? (
+        <>
+          <SectionHeader title="My Templates" mt="xl" />
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} height={160} radius="md" />
+            ))}
+          </SimpleGrid>
+        </>
       ) : (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {templatesShared?.map((template) => (
-            <ShoppingListCard
-              key={template.id}
-              list={template}
-              footer={
-                <Button
-                  fullWidth
-                  variant="light"
-                  leftSection={<IconCopy size={16} />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleUseTemplate(template);
-                  }}
-                >
-                  Use Template
-                </Button>
-              }
-            />
-          ))}
-        </SimpleGrid>
+        templatesOwned &&
+        templatesOwned.length > 0 && (
+          <>
+            <SectionHeader title="My Templates" mt="xl" />
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+              {templatesOwned?.map((template) => (
+                <ShoppingListCard
+                  key={template.id}
+                  list={template}
+                  footer={
+                    <Button
+                      fullWidth
+                      variant="light"
+                      leftSection={<IconCopy size={16} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUseTemplate(template);
+                      }}
+                    >
+                      Use Template
+                    </Button>
+                  }
+                />
+              ))}
+            </SimpleGrid>
+          </>
+        )
+      )}
+
+      {isLoadingTemplatesShared ? (
+        <>
+          <SectionHeader title="Shared Templates" mt="xl" />
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} height={160} radius="md" />
+            ))}
+          </SimpleGrid>
+        </>
+      ) : (
+        templatesShared &&
+        templatesShared?.length > 0 && (
+          <>
+            <SectionHeader title="Shared Templates" mt="xl" />
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+              {templatesShared?.map((template) => (
+                <ShoppingListCard
+                  key={template.id}
+                  list={template}
+                  footer={
+                    <Button
+                      fullWidth
+                      variant="light"
+                      leftSection={<IconCopy size={16} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUseTemplate(template);
+                      }}
+                    >
+                      Use Template
+                    </Button>
+                  }
+                />
+              ))}
+            </SimpleGrid>
+          </>
+        )
       )}
 
       <ShoppingListCreateModal
