@@ -3,19 +3,22 @@
 A real-time, collaborative shopping list application.
 
 ## Tech Stack
-* Monorepo: Turborepo + pnpm workspaces
-* Frontend: React, Vite, Mantine v7, React Query, @hello-pangea/dnd
-* Backend: Fastify, Drizzle ORM (Postgres), @fastify/websocket, Zod
-* Deployment: Docker, GitHub Actions (GHCR), Watchtower, Cloudflare Tunnels
+
+- Monorepo: Turborepo + pnpm workspaces
+- Frontend: React, Vite, Mantine v7, React Query, @hello-pangea/dnd
+- Backend: Fastify, Drizzle ORM (Postgres), @fastify/websocket, Zod
+- Deployment: Docker, GitHub Actions (GHCR), Watchtower, Cloudflare Tunnels
 
 ## Local Development
 
 ### Prerequisites
-* Node.js (v20+)
-* pnpm (v8+)
-* PostgreSQL
+
+- Node.js (v20+)
+- pnpm (v8+)
+- PostgreSQL
 
 ### Setup
+
 1. Install dependencies:
    ```bash
    pnpm install
@@ -40,24 +43,29 @@ A real-time, collaborative shopping list application.
 The deployment architecture utilizes GitHub Actions to build Docker images and push them to the GitHub Container Registry (GHCR). A target server runs Watchtower to automatically pull new images and restart containers, routed securely through a Cloudflare Tunnel.
 
 ### 1. GitHub Repository Configuration
+
 1. Navigate to repository **Settings > Secrets and variables > Actions**.
 2. Under the **Variables** tab, add:
-   * `VITE_API_URL`: The public URL of the API (e.g., `https://api.example.com`).
+   - `VITE_API_URL`: The public URL of the API (e.g., `https://api.example.com`).
 3. Under developer settings, generate a Personal Access Token (PAT) with the `read:packages` scope to allow the target server to pull images from GHCR.
 
 ### 2. Cloudflare Tunnel Configuration
+
 1. Create a Cloudflare Tunnel via the Zero Trust dashboard.
 2. Note the provided Tunnel Token.
 3. Configure two public hostnames routing to the internal Docker network:
-   * Frontend: `shopping.example.com` -> `HTTP://web:80`
-   * API: `api.example.com` -> `HTTP://api:3001`
+   - Frontend: `shopping.example.com` -> `HTTP://web:80`
+   - API: `api.example.com` -> `HTTP://api:3001`
 
 ### 3. Google OAuth Configuration
+
 Update the Google Cloud Console OAuth 2.0 Client ID with production URLs:
-* Authorized JavaScript origins: `https://api.example.com`, `https://shopping.example.com`
-* Authorized redirect URIs: `https://api.example.com/auth/callback/google`
+
+- Authorized JavaScript origins: `https://api.example.com`, `https://shopping.example.com`
+- Authorized redirect URIs: `https://api.example.com/auth/callback/google`
 
 ### 4. Target Server Setup
+
 1. Clone the repository on the target server.
 2. Copy the environment template:
    ```bash
@@ -75,10 +83,13 @@ Update the Google Cloud Console OAuth 2.0 Client ID with production URLs:
    ```
 
 ### 5. Continuous Deployment
+
 Pushing to the `production` branch automatically triggers the build and deploy pipeline.
+
 ```bash
 git checkout production
 git merge main
 git push origin production
 ```
+
 Watchtower on the target server will automatically detect the new images, apply database migrations upon container startup, and restart the services.
