@@ -1,5 +1,9 @@
 import { lazy } from 'react';
-import type { RouteSEO } from './seo.config';
+
+export interface RouteSEO {
+  title: string;
+  description?: string;
+}
 
 export interface AppRoute {
   path: string;
