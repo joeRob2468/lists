@@ -22,7 +22,7 @@ export const Lists = () => {
   return (
     <Container size="xl" py="md">
       <PageHeader
-        title="My Lists"
+        title="Lists"
         subtitle="View and manage all your active shopping lists."
         actions={
           <Button leftSection={<IconPlus size={18} />} onClick={() => setCreateModalOpen(true)}>
