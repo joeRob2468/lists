@@ -38,8 +38,7 @@ export const ListDetail = () => {
   if (isLoading) {
     return (
       <Container size="xl" py="md">
-        <Skeleton height={50} mb="xl" />
-        <Skeleton height={40} mb="xl" />
+        <Skeleton height={125} mb="xl" />
         <Stack>
           <Skeleton height={60} />
           <Skeleton height={60} />
