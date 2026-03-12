@@ -70,3 +70,8 @@ export const CreateShoppingListFromTemplateSchema = z.object({
   templateId: z.uuid(),
   newName: z.string().optional(),
 });
+
+export const SaveListAsTemplateSchema = z.object({
+  listId: z.uuid(),
+  newName: z.string().optional(),
+});
