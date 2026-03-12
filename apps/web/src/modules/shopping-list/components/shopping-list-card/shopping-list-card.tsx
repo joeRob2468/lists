@@ -1,5 +1,6 @@
 import { useUser } from '@/modules/auth/hooks/use-user';
 import { ActionIcon, Badge, Card, Group, Menu, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { ShoppingListSchema } from '@repo/common';
 import { IconCalendar, IconDots, IconPencil, IconTrash, IconUsers, type ReactNode } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +35,15 @@ export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = fa
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    deleteList(list.id);
+    deleteList(list.id, {
+      onSuccess: () => {
+        notifications.show({
+          title: 'Success',
+          message: list.isTemplate ? 'Template deleted' : 'List deleted',
+          color: 'green',
+        });
+      },
+    });
   };
 
   const handleOpen = (e: React.MouseEvent) => {
