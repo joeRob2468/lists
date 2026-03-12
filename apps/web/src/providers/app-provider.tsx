@@ -1,5 +1,6 @@
 import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
+import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -25,8 +26,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     <HelmetProvider>
       <MantineProvider theme={theme} defaultColorScheme="dark">
         <QueryClientProvider client={queryClient}>
-          {children}
-          <ReactQueryDevtools initialIsOpen={false} />
+          <ModalsProvider>
+            {children}
+            <ReactQueryDevtools initialIsOpen={false} />
+          </ModalsProvider>
           <Notifications />
         </QueryClientProvider>
       </MantineProvider>

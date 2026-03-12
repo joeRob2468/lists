@@ -3,18 +3,22 @@ import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { SEO } from '@/components/ui/seo/seo';
 import { useUser } from '@/modules/auth/hooks/use-user';
 import { Badge, Button, Container, Group, Skeleton, Stack, Text, Textarea, Title } from '@mantine/core';
-import { IconCopy, IconShare, IconTemplate, IconUsers } from '@tabler/icons-react';
+import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
+import { IconCopy, IconShare, IconTemplate, IconTrash, IconUsers } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ShoppingItemAddForm } from '../components/shopping-item-add-form/shopping-item-add-form';
 import { ShoppingItemsList } from '../components/shopping-items-list/shopping-items-list';
 import { ShoppingListCreateModal } from '../components/shopping-list-create-modal/shopping-list-create-modal';
 import { ShareListModal } from '../components/shopping-list-share-modal/shopping-list-share-modal';
 import { useShoppingList } from '../hooks/use-shopping-list';
+import { useShoppingListMutations } from '../hooks/use-shopping-list-mutations';
 
 export const ListDetail = () => {
   const { listId } = useParams<{ listId: string }>();
   const { user } = useUser();
+  const navigate = useNavigate();
 
   const {
     list,
@@ -30,6 +34,7 @@ export const ListDetail = () => {
     isPending,
     isUpdateListPending,
   } = useShoppingList(listId);
+  const { deleteList, isDeletePending } = useShoppingListMutations();
 
   const activeItems = items.filter((item) => !item.isChecked);
   const checkedItems = items.filter((item) => item.isChecked);
@@ -55,6 +60,33 @@ export const ListDetail = () => {
     } else if (trimmed !== list.name) {
       updateList({ listId: list.id, data: { name: trimmed } });
     }
+  };
+
+  const handleDelete = () => {
+    if (!list) return;
+
+    modals.openConfirmModal({
+      title: `Confirm deletion`,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete the "{list.name}" {list.isTemplate ? 'template' : 'list'}?
+        </Text>
+      ),
+      confirmProps: { color: 'red', leftSection: <IconTrash size={18} /> },
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      onConfirm: () => {
+        deleteList(list.id, {
+          onSuccess: () => {
+            notifications.show({
+              title: 'Success',
+              message: list.isTemplate ? 'Template deleted' : 'List deleted',
+              color: 'green',
+            });
+            navigate('/dashboard');
+          },
+        });
+      },
+    });
   };
 
   if (isLoading) {
@@ -142,9 +174,19 @@ export const ListDetail = () => {
                 {list.isTemplate ? 'Create List' : 'Save as Template'}
               </Button>
               {isOwner && (
-                <Button leftSection={<IconShare size={18} />} onClick={() => setShareModalOpen(true)}>
-                  Share
-                </Button>
+                <>
+                  <Button leftSection={<IconShare size={18} />} onClick={() => setShareModalOpen(true)}>
+                    Share
+                  </Button>
+                  <Button
+                    leftSection={<IconTrash size={18} />}
+                    disabled={isDeletePending}
+                    onClick={handleDelete}
+                    color="red"
+                  >
+                    Delete
+                  </Button>
+                </>
               )}
             </Group>
           }

@@ -15,6 +15,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@mantine/core": "^8.3.13",
     "@mantine/hooks": "^8.3.13",
+    "@mantine/modals": "^8.3.16",
     "@mantine/notifications": "^8.3.15",
     "@repo/common": "workspace:*",
     "@repo/env": "workspace:*",
