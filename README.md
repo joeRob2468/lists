@@ -42,6 +42,29 @@ A real-time, collaborative shopping list application.
 
 The deployment architecture utilizes GitHub Actions to build Docker images and push them to the GitHub Container Registry (GHCR). A target server runs Watchtower to automatically pull new images and restart containers, routed securely through a Cloudflare Tunnel.
 
+### Manual Deploy (Local Machine)
+
+Uses `buildx` for cross-platform compatibility.
+```bash
+   pnpm deploy
+```
+
+### Automatic Deploy (CI/CD)
+
+Pushing to the `production` branch triggers parallel builds in GitHub Actions.
+1. Images are pushed to GHCR.
+2. Server-side Watchtower detects new :latest tags.
+3. Containers restart, Drizzle migrations are run on startup.
+
+### Required Environment Variables
+
+|Variable       |Purpose                                  |
+|---------------|-----------------------------------------|
+|GITHUB_USERNAME|Pathing for Container Registry           |
+|PROJECT_NAME   |Consistent image naming                  |
+|VITE_API_URL   |Baked into Web build for API connectivity|
+
+
 ### 1. GitHub Repository Configuration
 
 1. Navigate to repository **Settings > Secrets and variables > Actions**.
@@ -71,7 +94,7 @@ Update the Google Cloud Console OAuth 2.0 Client ID with production URLs:
    ```bash
    cp .env.example .env
    ```
-3. Populate the `.env` file. Ensure `GITHUB_USERNAME` and `CLOUDFLARE_TUNNEL_TOKEN` are set.
+3. Populate the `.env` file. Ensure `PROJECT_NAME`, `GITHUB_USERNAME` and `CLOUDFLARE_TUNNEL_TOKEN` are set.
 4. Authenticate Docker with GHCR using the PAT generated in Step 1:
    ```bash
    docker login ghcr.io -u <GITHUB_USERNAME>

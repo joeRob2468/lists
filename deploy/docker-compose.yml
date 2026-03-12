@@ -7,22 +7,22 @@ services:
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
-      POSTGRES_DB: shopping_list
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
   api:
-    image: ghcr.io/${GITHUB_USERNAME}/shopping-list-api:latest
+    image: ghcr.io/${GITHUB_USERNAME}/${PROJECT_NAME}-api:latest
     restart: always
     depends_on:
       - db
     env_file: 
       - ../.env 
     environment:
-      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/shopping_list
+      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/${DB_NAME:-shopping_list}
 
   web:
-    image: ghcr.io/${GITHUB_USERNAME}/shopping-list-web:latest
+    image: ghcr.io/${GITHUB_USERNAME}/${PROJECT_NAME}-web:latest
     restart: always
 
   cloudflared:
@@ -38,7 +38,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /root/.docker/config.json:/config.json
-    command: --interval 60 --cleanup
+    command: --interval 60 --cleanup --debug
 
 volumes:
   pgdata:
