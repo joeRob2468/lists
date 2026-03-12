@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    env_file: 
+      - ../.env
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: shopping_list
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    image: ghcr.io/${GITHUB_USERNAME}/shopping-list-api:latest
+    restart: always
+    depends_on:
+      - db
+    env_file: 
+      - ../.env 
+    environment:
+      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/shopping_list
+
+  web:
+    image: ghcr.io/${GITHUB_USERNAME}/shopping-list-web:latest
+    restart: always
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: always
+    command: tunnel run
+    env_file: 
+      - ../.env
+
+  watchtower:
+    image: containrrr/watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json
+    command: --interval 60 --cleanup
+
+volumes:
+  pgdata:

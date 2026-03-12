@@ -3,17 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w",
+    "build": "tsdown src/index.ts && tsc --emitDeclarationOnly",
+    "dev": "tsdown src/index.ts --watch --no-clean",
     "lint": "eslint src/**"
   },
   "dependencies": {
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "tsdown": "^0.21.2",
     "typescript": "^5.0.0"
   }
 }

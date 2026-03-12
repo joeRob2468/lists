@@ -55,7 +55,7 @@ const start = async () => {
     await app.register(userModule, { prefix: '/user' });
     await app.register(listModule, { prefix: '/lists' });
 
-    await app.listen({ port: env.API_PORT });
+    await app.listen({ port: env.API_PORT, host: '0.0.0.0', ipv6Only: false });
   } catch (err) {
     app.log.error(err);
     process.exit(1);

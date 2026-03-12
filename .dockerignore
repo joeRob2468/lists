@@ -1,0 +1,10 @@
+# Ignore local node_modules
+node_modules
+**/node_modules
+
+# Ignore local build artifacts
+**/dist
+**/.env
+
+.git
+.turbo

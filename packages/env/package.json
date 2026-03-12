@@ -1,13 +1,18 @@
 {
   "name": "@repo/env",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "sideEffects": false,
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown src/index.ts && tsc --emitDeclarationOnly"
+  },
   "devDependencies": {
     "@types/node": "^25.0.9",
+    "tsdown": "^0.21.2",
     "typescript": "^5.x.x"
   },
   "dependencies": {

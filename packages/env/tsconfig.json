@@ -3,8 +3,9 @@
   "compilerOptions": {
     "outDir": "./dist",
     "declaration": true,
-    "noEmit": false,
-    "types": ["node"]
+    "noEmit": false, 
+    "types": ["node"],
+    "skipLibCheck": true
   },
   "include": ["src"]
 }
