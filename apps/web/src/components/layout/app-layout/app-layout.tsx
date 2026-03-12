@@ -16,7 +16,7 @@ export const AppLayout = () => {
       <Button
         key={item.label}
         variant={isActive ? 'light' : 'subtle'}
-        color={isActive ? 'blue' : 'gray'}
+        color={isActive ? '' : 'gray'}
         onClick={() => navigate(item.link)}
         leftSection={<item.icon size="1.1rem" />}
         size="sm"

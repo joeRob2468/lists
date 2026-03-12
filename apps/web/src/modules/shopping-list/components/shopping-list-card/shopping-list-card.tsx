@@ -59,7 +59,7 @@ export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = fa
 
         <Group gap="xs">
           {list.isShared && (
-            <Badge variant="light" color="blue" leftSection={<IconUsers size={12} />}>
+            <Badge variant="light" leftSection={<IconUsers size={12} />}>
               Shared
             </Badge>
           )}
