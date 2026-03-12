@@ -14,7 +14,7 @@ const FormSchema = CreateShoppingListSchema.pick({
   name: true,
 });
 type FormValues = z.infer<typeof FormSchema>;
-export type ShoppingListCreateModalMode = 'create-list' | 'create-template' | 'use-template';
+export type ShoppingListCreateModalMode = 'create-list' | 'create-template' | 'use-template' | 'save-as-template';
 
 interface ShoppingListCreateModalProps {
   opened: boolean;
@@ -55,7 +55,14 @@ export const ShoppingListCreateModal = ({
 
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      if (mode === 'use-template') {
+      if (mode === 'save-as-template') {
+        if (!templateId) throw new Error('Template ID missing');
+        return apiClient
+          .post('lists/save-as-template', {
+            json: { listId: templateId, newName: values.name },
+          })
+          .json<z.infer<typeof ShoppingListWithItemsSchema>>();
+      } else if (mode === 'use-template') {
         if (!templateId) throw new Error('Template ID missing');
         return apiClient
           .post('lists/from-template', {
@@ -78,13 +85,16 @@ export const ShoppingListCreateModal = ({
 
       notifications.show({
         title: 'Success',
-        message: mode === 'create-template' ? 'Template created' : 'List created',
+        message: mode === 'create-template' || mode === 'save-as-template' ? 'Template created' : 'List created',
         color: 'green',
       });
 
       reset();
       onClose();
-      navigate(`/lists/${newList.id}`);
+
+      if (mode !== 'save-as-template') {
+        navigate(`/lists/${newList.id}`);
+      }
     },
     onError: () => {
       notifications.show({
@@ -104,9 +114,11 @@ export const ShoppingListCreateModal = ({
       case 'create-template':
         return 'New Template';
       case 'use-template':
-        return 'Create List from Template';
+        return 'Create List';
+      case 'save-as-template':
+        return 'Create Template';
       default:
-        return 'New List';
+        return 'Create List';
     }
   };
 
@@ -117,6 +129,8 @@ export const ShoppingListCreateModal = ({
         return 'Create Template';
       case 'use-template':
         return 'Create List';
+      case 'save-as-template':
+        return 'Save Template';
       default:
         return 'Create List';
     }

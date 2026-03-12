@@ -2,12 +2,13 @@ import { PageHeader } from '@/components/ui/page-header/page-header';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { SEO } from '@/components/ui/seo/seo';
 import { useUser } from '@/modules/auth/hooks/use-user';
-import { Button, Container, Skeleton, Stack, Text } from '@mantine/core';
-import { IconShare } from '@tabler/icons-react';
+import { Button, Container, Group, Skeleton, Stack, Text } from '@mantine/core';
+import { IconCopy, IconShare } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShoppingItemAddForm } from '../components/shopping-item-add-form/shopping-item-add-form';
 import { ShoppingItemsList } from '../components/shopping-items-list/shopping-items-list';
+import { ShoppingListCreateModal } from '../components/shopping-list-create-modal/shopping-list-create-modal';
 import { ShareListModal } from '../components/shopping-list-share-modal/shopping-list-share-modal';
 import { useShoppingList } from '../hooks/use-shopping-list';
 
@@ -34,6 +35,7 @@ export const ListDetail = () => {
   const checkedItems = items.filter((item) => item.isChecked);
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -70,11 +72,16 @@ export const ListDetail = () => {
               : 'This is a shared list - you can add and check off items.'
           }
           actions={
-            isOwner && (
-              <Button leftSection={<IconShare size={18} />} onClick={() => setShareModalOpen(true)}>
-                Share
+            <Group>
+              <Button variant="default" leftSection={<IconCopy size={18} />} onClick={() => setTemplateModalOpen(true)}>
+                Save as Template
               </Button>
-            )
+              {isOwner && (
+                <Button leftSection={<IconShare size={18} />} onClick={() => setShareModalOpen(true)}>
+                  Share
+                </Button>
+              )}
+            </Group>
           }
         />
 
@@ -119,6 +126,14 @@ export const ListDetail = () => {
           isLoading={isUpdateListPending}
         />
       )}
+
+      <ShoppingListCreateModal
+        opened={templateModalOpen}
+        onClose={() => setTemplateModalOpen(false)}
+        mode="save-as-template"
+        templateId={list.id}
+        initialName={`${list.name} Template`}
+      />
     </>
   );
 };
