@@ -1,24 +1,23 @@
+name: lists-dev
 services:
-  # The Database
   db:
     image: postgres:16-alpine
-    container_name: shopping_list_db
+    container_name: lists_db
     ports:
       - "5432:5432"
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: shopping_list
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-lists_database}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-shopping_list}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  # Mailpit - Catches emails sent by API during dev (auth emails, invites).
-  mailpit:
-    image: axllent/mailpit
-    container_name: shopping_list_mail
-    ports:
-      - "8025:8025" # UI
-      - "1025:1025" # SMTP Port
 
 volumes:
   postgres_data:

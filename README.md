@@ -44,15 +44,16 @@ The deployment architecture utilizes GitHub Actions to build Docker images and p
 
 ### Required Environment Variables
 
-|Variable       |Purpose                                  |
-|---------------|-----------------------------------------|
-|GITHUB_USERNAME|Pathing for Container Registry           |
-|PROJECT_NAME   |Consistent image naming                  |
-|VITE_API_URL   |Baked into Web build for API connectivity|
+| Variable        | Purpose                                   |
+| --------------- | ----------------------------------------- |
+| GITHUB_USERNAME | Pathing for Container Registry            |
+| PROJECT_NAME    | Consistent image naming                   |
+| VITE_API_URL    | Baked into Web build for API connectivity |
 
 ### Manual Deploy (Local Machine)
 
 Uses `buildx` for cross-platform compatibility.
+
 ```bash
    pnpm deploy
 ```
@@ -60,10 +61,10 @@ Uses `buildx` for cross-platform compatibility.
 ### Automatic Deploy (CI/CD)
 
 Pushing to the `production` branch triggers parallel builds in GitHub Actions.
+
 1. Images are pushed to GHCR.
 2. Server-side Watchtower detects new :latest tags.
 3. Containers restart, Drizzle migrations are run on startup.
-
 
 ### 1. GitHub Repository Configuration
 
