@@ -1,13 +1,19 @@
+name: lists
 services:
   db:
     image: postgres:15-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-lists_database}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: always
     env_file: 
       - ../.env
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_DB: ${DB_NAME:-lists_database}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -15,11 +21,12 @@ services:
     image: ghcr.io/${GITHUB_USERNAME}/${PROJECT_NAME}-api:latest
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file: 
       - ../.env 
     environment:
-      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/${DB_NAME:-shopping_list}
+      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/${DB_NAME:-lists_database}
 
   web:
     image: ghcr.io/${GITHUB_USERNAME}/${PROJECT_NAME}-web:latest
