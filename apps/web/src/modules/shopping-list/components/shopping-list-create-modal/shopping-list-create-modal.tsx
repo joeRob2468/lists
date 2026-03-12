@@ -1,25 +1,25 @@
-import { apiClient } from '@/api/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Group, Modal, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { CreateShoppingListSchema, ShoppingListSchema, ShoppingListWithItemsSchema } from '@repo/common';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CreateShoppingListSchema } from '@repo/common';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { useShoppingListMutations, type CreateListMode } from '../../hooks/use-shopping-list-mutations';
 import classes from './shopping-list-create-modal.module.css';
 
 const FormSchema = CreateShoppingListSchema.pick({
   name: true,
 });
 type FormValues = z.infer<typeof FormSchema>;
-export type ShoppingListCreateModalMode = 'create-list' | 'create-template' | 'use-template' | 'save-as-template';
+
+export type ShoppingListCreateModalMode = CreateListMode;
 
 interface ShoppingListCreateModalProps {
   opened: boolean;
   onClose: () => void;
-  mode?: ShoppingListCreateModalMode;
+  mode?: CreateListMode;
   templateId?: string;
   initialName?: string;
 }
@@ -32,7 +32,7 @@ export const ShoppingListCreateModal = ({
   initialName = '',
 }: ShoppingListCreateModalProps) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { createList, isCreatePending } = useShoppingListMutations();
 
   const {
     register,
@@ -42,68 +42,37 @@ export const ShoppingListCreateModal = ({
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: initialName,
-    },
+    defaultValues: { name: initialName },
   });
 
   useEffect(() => {
-    if (opened) {
-      setValue('name', initialName);
-    }
+    if (opened) setValue('name', initialName);
   }, [opened, initialName, setValue]);
 
-  const mutation = useMutation({
-    mutationFn: async (values: FormValues) => {
-      if (mode === 'save-as-template') {
-        if (!templateId) throw new Error('Template ID missing');
-        return apiClient
-          .post('lists/save-as-template', {
-            json: { listId: templateId, newName: values.name },
-          })
-          .json<z.infer<typeof ShoppingListWithItemsSchema>>();
-      } else if (mode === 'use-template') {
-        if (!templateId) throw new Error('Template ID missing');
-        return apiClient
-          .post('lists/from-template', {
-            json: { templateId, newName: values.name },
-          })
-          .json<z.infer<typeof ShoppingListWithItemsSchema>>();
-      } else {
-        return apiClient
-          .post('lists', {
-            json: {
-              name: values.name,
-              isTemplate: mode === 'create-template',
-            },
-          })
-          .json<z.infer<typeof ShoppingListSchema>>();
-      }
-    },
-    onSuccess: (newList) => {
-      queryClient.invalidateQueries({ queryKey: ['lists'] });
-
-      notifications.show({
-        title: 'Success',
-        message: mode === 'create-template' || mode === 'save-as-template' ? 'Template created' : 'List created',
-        color: 'green',
-      });
-
-      reset();
-      onClose();
-      navigate(`/lists/${newList.id}`);
-    },
-    onError: () => {
-      notifications.show({
-        title: 'Error',
-        message: 'Operation failed',
-        color: 'red',
-      });
-    },
-  });
-
   const onSubmit = (data: FormValues) => {
-    mutation.mutate(data);
+    createList(
+      { name: data.name, mode, templateId },
+      {
+        onSuccess: (newList) => {
+          notifications.show({
+            title: 'Success',
+            message: mode === 'create-template' || mode === 'save-as-template' ? 'Template created' : 'List created',
+            color: 'green',
+          });
+
+          reset();
+          onClose();
+          navigate(`/lists/${newList.id}`);
+        },
+        onError: () => {
+          notifications.show({
+            title: 'Error',
+            message: 'Operation failed',
+            color: 'red',
+          });
+        },
+      },
+    );
   };
 
   const getTitle = () => {
@@ -111,16 +80,16 @@ export const ShoppingListCreateModal = ({
       case 'create-template':
         return 'New Template';
       case 'use-template':
-        return 'Create List';
+        return 'Create List from Template';
       case 'save-as-template':
-        return 'Create Template';
+        return 'Save as Template';
       default:
-        return 'Create List';
+        return 'New List';
     }
   };
 
   const getButtonLabel = () => {
-    if (mutation.isPending) return 'Saving...';
+    if (isCreatePending) return 'Saving...';
     switch (mode) {
       case 'create-template':
         return 'Create Template';
@@ -137,7 +106,7 @@ export const ShoppingListCreateModal = ({
     <Modal opened={opened} onClose={onClose} title={getTitle()} centered>
       <form onSubmit={handleSubmit(onSubmit)} className={classes.form}>
         <TextInput
-          label="List Name"
+          label="Name"
           placeholder="e.g., Weekly Groceries, Costco Run"
           data-autofocus
           withAsterisk
@@ -149,7 +118,7 @@ export const ShoppingListCreateModal = ({
           <Button variant="default" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" loading={isSubmitting || mutation.isPending}>
+          <Button type="submit" loading={isSubmitting || isCreatePending}>
             {getButtonLabel()}
           </Button>
         </Group>
