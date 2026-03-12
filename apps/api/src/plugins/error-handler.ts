@@ -4,9 +4,9 @@ import fp from 'fastify-plugin';
 import { FastifyError } from 'fastify';
 
 export default fp(async (app) => {
-  app.setErrorHandler((error: FastifyError, request, reply) => {
+  app.setErrorHandler((error: FastifyError, _req, res) => {
     if (error instanceof ApiError) {
-      return reply.status(error.statusCode).send({
+      return res.status(error.statusCode).send({
         error: error.error,
         message: error.message,
         statusCode: error.statusCode,
@@ -15,7 +15,7 @@ export default fp(async (app) => {
     }
 
     if (error instanceof ZodError) {
-      return reply.status(400).send({
+      return res.status(400).send({
         error: 'BAD_REQUEST',
         message: 'Validation failed',
         statusCode: 400,
@@ -26,7 +26,7 @@ export default fp(async (app) => {
     const statusCode = error.statusCode ?? 500;
     app.log.error(error);
 
-    return reply.status(statusCode).send({
+    return res.status(statusCode).send({
       error: statusCode === 500 ? 'INTERNAL_SERVER_ERROR' : error.name,
       message: error.message || 'An unexpected error occurred',
       statusCode,
