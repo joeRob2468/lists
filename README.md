@@ -1,6 +1,6 @@
-# Shopping List
+# Lists
 
-A real-time, collaborative shopping list application.
+A simple, collaborative shopping list app. Create templates, share with family, and check off items in real-time.
 
 ## Tech Stack
 
@@ -42,6 +42,14 @@ A real-time, collaborative shopping list application.
 
 The deployment architecture utilizes GitHub Actions to build Docker images and push them to the GitHub Container Registry (GHCR). A target server runs Watchtower to automatically pull new images and restart containers, routed securely through a Cloudflare Tunnel.
 
+### Required Environment Variables
+
+|Variable       |Purpose                                  |
+|---------------|-----------------------------------------|
+|GITHUB_USERNAME|Pathing for Container Registry           |
+|PROJECT_NAME   |Consistent image naming                  |
+|VITE_API_URL   |Baked into Web build for API connectivity|
+
 ### Manual Deploy (Local Machine)
 
 Uses `buildx` for cross-platform compatibility.
@@ -55,14 +63,6 @@ Pushing to the `production` branch triggers parallel builds in GitHub Actions.
 1. Images are pushed to GHCR.
 2. Server-side Watchtower detects new :latest tags.
 3. Containers restart, Drizzle migrations are run on startup.
-
-### Required Environment Variables
-
-|Variable       |Purpose                                  |
-|---------------|-----------------------------------------|
-|GITHUB_USERNAME|Pathing for Container Registry           |
-|PROJECT_NAME   |Consistent image naming                  |
-|VITE_API_URL   |Baked into Web build for API connectivity|
 
 
 ### 1. GitHub Repository Configuration
@@ -107,12 +107,4 @@ Update the Google Cloud Console OAuth 2.0 Client ID with production URLs:
 
 ### 5. Continuous Deployment
 
-Pushing to the `production` branch automatically triggers the build and deploy pipeline.
-
-```bash
-git checkout production
-git merge main
-git push origin production
-```
-
-Watchtower on the target server will automatically detect the new images, apply database migrations upon container startup, and restart the services.
+Pushing to the `production` branch automatically triggers the build and deploy pipeline. Watchtower on the target server will automatically detect the new images, apply database migrations upon container startup, and restart the services.
