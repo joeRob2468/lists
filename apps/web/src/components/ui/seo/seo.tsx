@@ -1,4 +1,5 @@
-import { SEO_CONFIG, type RouteSEO } from '@/config/seo.config';
+import type { RouteSEO } from '@/config/routes.config';
+import { SEO_CONFIG } from '@/config/seo.config';
 import { Helmet } from 'react-helmet-async';
 
 interface SeoProps {
