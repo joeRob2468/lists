@@ -125,7 +125,7 @@ export const ListDetail = () => {
           actions={
             <Group>
               <Button variant="default" leftSection={<IconCopy size={18} />} onClick={() => setTemplateModalOpen(true)}>
-                Save as Template
+                {list.isTemplate ? 'Create List' : 'Save as Template'}
               </Button>
               {isOwner && (
                 <Button leftSection={<IconShare size={18} />} onClick={() => setShareModalOpen(true)}>
@@ -181,9 +181,9 @@ export const ListDetail = () => {
       <ShoppingListCreateModal
         opened={templateModalOpen}
         onClose={() => setTemplateModalOpen(false)}
-        mode="save-as-template"
+        mode={list.isTemplate ? 'create-list' : 'save-as-template'}
         templateId={list.id}
-        initialName={`${list.name} Template`}
+        initialName={list.isTemplate ? list.name : `${list.name} Template`}
       />
     </>
   );
