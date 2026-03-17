@@ -79,7 +79,7 @@ export const Dashboard = () => {
           <Text c="dimmed" mb="md">
             You don't have any active shopping lists.
           </Text>
-          <Button variant="outline" onClick={() => handleCreateList}>
+          <Button variant="outline" onClick={handleCreateList}>
             Create your first list
           </Button>
         </div>
