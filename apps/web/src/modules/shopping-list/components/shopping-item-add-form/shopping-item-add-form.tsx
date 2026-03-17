@@ -21,7 +21,7 @@ export const ShoppingItemAddForm = ({ onAdd, isLoading, hideTopBorder = false }:
   });
 
   const onSubmit = (data: CreateItemFormValues) => {
-    if (!data.name.trim()) return;
+    if (isLoading || !data.name.trim()) return;
     onAdd(data);
     reset();
   };
@@ -49,7 +49,6 @@ export const ShoppingItemAddForm = ({ onAdd, isLoading, hideTopBorder = false }:
         placeholder="Add a list item..."
         className={classes.input}
         {...register('name')}
-        disabled={isLoading}
         autoComplete="off"
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
