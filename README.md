@@ -8,6 +8,7 @@ A simple, collaborative shopping list app. Create templates, share with family, 
 - Frontend: React, Vite, Mantine v7, React Query, @hello-pangea/dnd
 - Backend: Fastify, Drizzle ORM (Postgres), @fastify/websocket, Zod
 - Deployment: Docker, GitHub Actions (GHCR), Watchtower, Cloudflare Tunnels
+- Analytics: Umami
 
 ## Local Development
 
@@ -71,8 +72,8 @@ Pushing to the `production` branch triggers parallel builds in GitHub Actions.
 1. Navigate to repository **Settings > Secrets and variables > Actions**.
 2. Under the **Variables** tab, add:
    - `VITE_API_URL`: The public URL of the API (e.g., `https://api.example.com`).
-   - `VITE_UMAMI_URL`: The public URL of the Umami instance (e.g., `https://example.com/stats`).
    - `VITE_UMAMI_WEBSITE_ID`: The website ID for the Umami instance.
+   - - *Note: nginx is configured to proxy the Umami container to the /stats subpath of the main domain*
 3. Under developer settings, generate a Personal Access Token (PAT) with the `read:packages` scope to allow the target server to pull images from GHCR.
 
 **2. Cloudflare Tunnel Configuration**
@@ -82,7 +83,6 @@ Pushing to the `production` branch triggers parallel builds in GitHub Actions.
 3. Configure public hostnames routing to the internal Docker network:
    - Frontend: `example.com` -> `HTTP://web:80`
    - API: `api.example.com` -> `HTTP://api:3001`
-   - Umami: `example.com/stats` -> `HTTP://umami:3000`
 
 **3. Google OAuth Configuration**
 
