@@ -59,6 +59,7 @@ services:
       DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD:-umami_password}@umami-db:5432/umami
       APP_SECRET: ${UMAMI_APP_SECRET}
       TRACKER_SCRIPT_NAME: ${UMAMI_TRACKER_SCRIPT_NAME}
+      BASE_PATH: ${UMAMI_BASE_PATH}
 
   cloudflared:
     image: cloudflare/cloudflared:latest

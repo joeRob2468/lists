@@ -71,7 +71,7 @@ Pushing to the `production` branch triggers parallel builds in GitHub Actions.
 1. Navigate to repository **Settings > Secrets and variables > Actions**.
 2. Under the **Variables** tab, add:
    - `VITE_API_URL`: The public URL of the API (e.g., `https://api.example.com`).
-   - `VITE_UMAMI_URL`: The public URL of the Umami instance (e.g., `https://stats.example.com`).
+   - `VITE_UMAMI_URL`: The public URL of the Umami instance (e.g., `https://example.com/stats`).
    - `VITE_UMAMI_WEBSITE_ID`: The website ID for the Umami instance.
 3. Under developer settings, generate a Personal Access Token (PAT) with the `read:packages` scope to allow the target server to pull images from GHCR.
 
@@ -80,9 +80,9 @@ Pushing to the `production` branch triggers parallel builds in GitHub Actions.
 1. Create a Cloudflare Tunnel via the Zero Trust dashboard.
 2. Note the provided Tunnel Token.
 3. Configure public hostnames routing to the internal Docker network:
-   - Frontend: `shopping.example.com` -> `HTTP://web:80`
+   - Frontend: `example.com` -> `HTTP://web:80`
    - API: `api.example.com` -> `HTTP://api:3001`
-   - Umami: `stats.example.com` -> `HTTP://umami:3000`
+   - Umami: `example.com/stats` -> `HTTP://umami:3000`
 
 **3. Google OAuth Configuration**
 
