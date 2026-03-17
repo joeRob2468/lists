@@ -6,6 +6,7 @@ import {
   CreateShoppingListFromTemplateSchema,
   CreateShoppingListSchema,
   ReorderShoppingItemsSchema,
+  SaveListAsTemplateSchema,
   ShoppingItemSchema,
   ShoppingListSchema,
   ShoppingListWithItemsSchema,
@@ -16,7 +17,6 @@ import {
 import { and, asc, desc, eq, inArray, ne, or } from 'drizzle-orm';
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { SaveListAsTemplateSchema } from '../../../../../packages/common/src/schemas/shopping-list.schemas';
 
 export const listModule: FastifyPluginAsyncZod = async (app) => {
   // --- List Endpoints ---
