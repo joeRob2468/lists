@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - production
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual deploy'
+        required: false
+        default: 'Manual trigger'
 
 env:
   REGISTRY: ghcr.io
