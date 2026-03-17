@@ -193,7 +193,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
             name: item.name,
             category: item.category,
             quantity: item.quantity,
-            isChecked: false,
+            isChecked: item.isChecked,
             position: item.position,
           })),
         );
@@ -250,7 +250,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
             name: item.name,
             category: item.category,
             quantity: item.quantity,
-            isChecked: false, // Reset item checked state
+            isChecked: item.isChecked,
             position: item.position,
           })),
         );
