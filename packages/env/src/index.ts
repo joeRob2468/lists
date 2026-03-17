@@ -18,7 +18,7 @@ export const env = createEnv({
     // client side variables (web and api)
     VITE_API_URL: z.url(),
     VITE_UMAMI_URL: z.url().optional(),
-    VITE_UMAMI_WEBSITE_ID: z.url().optional(),
+    VITE_UMAMI_WEBSITE_ID: z.string().optional(),
   },
   runtimeEnv: {
     API_PORT: process.env.API_PORT,
