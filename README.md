@@ -66,29 +66,32 @@ Pushing to the `production` branch triggers parallel builds in GitHub Actions.
 2. Server-side Watchtower detects new :latest tags.
 3. Containers restart, Drizzle migrations are run on startup.
 
-### 1. GitHub Repository Configuration
+**1. GitHub Repository Configuration**
 
 1. Navigate to repository **Settings > Secrets and variables > Actions**.
 2. Under the **Variables** tab, add:
    - `VITE_API_URL`: The public URL of the API (e.g., `https://api.example.com`).
+   - `VITE_UMAMI_URL`: The public URL of the Umami instance (e.g., `https://stats.example.com`).
+   - `VITE_UMAMI_WEBSITE_ID`: The website ID for the Umami instance.
 3. Under developer settings, generate a Personal Access Token (PAT) with the `read:packages` scope to allow the target server to pull images from GHCR.
 
-### 2. Cloudflare Tunnel Configuration
+**2. Cloudflare Tunnel Configuration**
 
 1. Create a Cloudflare Tunnel via the Zero Trust dashboard.
 2. Note the provided Tunnel Token.
-3. Configure two public hostnames routing to the internal Docker network:
+3. Configure public hostnames routing to the internal Docker network:
    - Frontend: `shopping.example.com` -> `HTTP://web:80`
    - API: `api.example.com` -> `HTTP://api:3001`
+   - Umami: `stats.example.com` -> `HTTP://umami:3000`
 
-### 3. Google OAuth Configuration
+**3. Google OAuth Configuration**
 
 Update the Google Cloud Console OAuth 2.0 Client ID with production URLs:
 
 - Authorized JavaScript origins: `https://api.example.com`, `https://shopping.example.com`
 - Authorized redirect URIs: `https://api.example.com/auth/callback/google`
 
-### 4. Target Server Setup
+**4. Target Server Setup**
 
 1. Clone the repository on the target server.
 2. Copy the environment template:
@@ -106,6 +109,6 @@ Update the Google Cloud Console OAuth 2.0 Client ID with production URLs:
    docker compose up -d
    ```
 
-### 5. Continuous Deployment
+**5. Continuous Deployment**
 
 Pushing to the `production` branch automatically triggers the build and deploy pipeline. Watchtower on the target server will automatically detect the new images, apply database migrations upon container startup, and restart the services.
