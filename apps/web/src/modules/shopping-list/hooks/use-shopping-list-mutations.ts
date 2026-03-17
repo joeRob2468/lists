@@ -26,6 +26,15 @@ export function useShoppingListMutations() {
     },
   });
 
+  const removeSharedList = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.delete(`lists/${id}/access`, { json: {} }).json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lists'] });
+    },
+  });
+
   const createListMutation = useMutation({
     mutationFn: async ({ name, mode, templateId }: CreateListArgs) => {
       if (mode === 'save-as-template') {
@@ -66,5 +75,7 @@ export function useShoppingListMutations() {
     isDeletePending: deleteListMutation.isPending,
     createList: createListMutation.mutate,
     isCreatePending: createListMutation.isPending,
+    removeSharedList: removeSharedList.mutate,
+    isRemoveSharedListPending: removeSharedList.isPending,
   };
 }

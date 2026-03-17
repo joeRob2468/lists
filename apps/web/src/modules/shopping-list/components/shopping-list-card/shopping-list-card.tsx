@@ -20,7 +20,7 @@ interface ShoppingListCardProps {
 
 export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = false }: ShoppingListCardProps) => {
   const navigate = useNavigate();
-  const { deleteList } = useShoppingListMutations();
+  const { deleteList, removeSharedList } = useShoppingListMutations();
   const { user } = useUser();
 
   const isOwner = user?.id === list.ownerId;
@@ -40,6 +40,19 @@ export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = fa
         notifications.show({
           title: 'Success',
           message: list.isTemplate ? 'Template deleted' : 'List deleted',
+          color: 'green',
+        });
+      },
+    });
+  };
+
+  const handleRemoveShared = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    removeSharedList(list.id, {
+      onSuccess: () => {
+        notifications.show({
+          title: 'Success',
+          message: list.isTemplate ? 'Template removed from your dashboard' : 'List removed from your dashboard',
           color: 'green',
         });
       },
@@ -86,8 +99,12 @@ export const ShoppingListCard = ({ list, footer, menuItems, hideDefaultMenu = fa
                     <Menu.Item leftSection={<IconPencil size={14} />} onClick={handleOpen}>
                       Edit
                     </Menu.Item>
-                    {isOwner && (
+                    {isOwner ? (
                       <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={handleDelete}>
+                        Delete
+                      </Menu.Item>
+                    ) : (
+                      <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={handleRemoveShared}>
                         Delete
                       </Menu.Item>
                     )}
