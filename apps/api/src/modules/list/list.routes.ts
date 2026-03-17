@@ -319,6 +319,32 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
     },
   });
 
+  app.route({
+    method: 'DELETE',
+    url: '/:id/access',
+    onRequest: [app.authenticate],
+    schema: {
+      tags: ['Lists'],
+      summary: "Remove a shared list from the current user's access records",
+      params: z.object({ id: z.uuid() }),
+      response: {
+        204: z.null(),
+      },
+    },
+    handler: async (req, res) => {
+      const result = await app.db
+        .delete(sharedListAccess)
+        .where(and(eq(sharedListAccess.listId, req.params.id), eq(sharedListAccess.userId, req.user.id)))
+        .returning({ listId: sharedListAccess.listId });
+
+      if (result.length === 0) {
+        throw new ApiError(404, 'NOT_FOUND', 'Access record not found.');
+      }
+
+      res.status(204).send(null);
+    },
+  });
+
   // --- Item Endpoints ---
 
   app.route({
