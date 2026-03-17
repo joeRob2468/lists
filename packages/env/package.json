@@ -8,7 +8,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsdown src/index.ts && tsc --emitDeclarationOnly"
+    "build": "tsdown src/index.ts && tsc --emitDeclarationOnly",
+    "lint": "eslint src/**",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

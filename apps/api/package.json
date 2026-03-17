@@ -8,6 +8,7 @@
     "build": "tsdown src/index.ts",
     "start": "dotenv -e ../../.env -- node dist/index.mjs",
     "lint": "eslint src/**",
+    "typecheck": "tsc --noEmit",
     "db:generate": "dotenv -e ../../.env -- drizzle-kit generate",
     "db:migrate": "dotenv -e ../../.env -- drizzle-kit migrate",
     "db:studio": "dotenv -e ../../.env -- drizzle-kit studio"
