@@ -73,7 +73,7 @@ Pushing to the `production` branch triggers parallel builds in GitHub Actions.
 2. Under the **Variables** tab, add:
    - `VITE_API_URL`: The public URL of the API (e.g., `https://api.example.com`).
    - `VITE_UMAMI_WEBSITE_ID`: The website ID for the Umami instance.
-   - - *Note: nginx is configured to proxy the Umami container to the /stats subpath of the main domain*
+   - - _Note: nginx is configured to proxy the Umami container to the /stats subpath of the main domain_
 3. Under developer settings, generate a Personal Access Token (PAT) with the `read:packages` scope to allow the target server to pull images from GHCR.
 
 **2. Cloudflare Tunnel Configuration**

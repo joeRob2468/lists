@@ -48,7 +48,7 @@ services:
       - umami-db-data:/var/lib/postgresql/data
   
   umami:
-    image: ghcr.io/umami-software/umami:postgresql-latest
+    image: ghcr.io/${GITHUB_USERNAME}/${PROJECT_NAME}-umami:latest
     restart: always
     depends_on:
       umami-db:
@@ -59,7 +59,7 @@ services:
       DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD:-umami_password}@umami-db:5432/umami
       APP_SECRET: ${UMAMI_APP_SECRET}
       TRACKER_SCRIPT_NAME: ${UMAMI_TRACKER_SCRIPT_NAME}
-      BASE_PATH: ${UMAMI_BASE_PATH}
+      BASE_PATH: ${UMAMI_BASE_PATH:-/stats}
 
   cloudflared:
     image: cloudflare/cloudflared:latest

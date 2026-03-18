@@ -17,7 +17,6 @@ export const env = createEnv({
   client: {
     // client side variables (web and api)
     VITE_API_URL: z.url(),
-    VITE_UMAMI_URL: z.url().optional(),
     VITE_UMAMI_WEBSITE_ID: z.string().optional(),
   },
   runtimeEnv: {
@@ -30,7 +29,6 @@ export const env = createEnv({
     AUTH_SECRET: process.env.AUTH_SECRET,
     ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
     VITE_API_URL: process.env.VITE_API_URL,
-    VITE_UMAMI_URL: process.env.VITE_UMAMI_URL,
     VITE_UMAMI_WEBSITE_ID: process.env.VITE_UMAMI_WEBSITE_ID,
   },
   emptyStringAsUndefined: true,
