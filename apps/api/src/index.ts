@@ -56,6 +56,15 @@ const start = async () => {
     await app.register(listModule, { prefix: '/lists' });
 
     await app.listen({ port: env.API_PORT, host: '0.0.0.0', ipv6Only: false });
+
+    const gracefulShutdown = async (signal: string) => {
+      app.log.info(`Received ${signal}, shutting down gracefully...`);
+      await app.close();
+      process.exit(0);
+    };
+
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
   } catch (err) {
     app.log.error(err);
     process.exit(1);
