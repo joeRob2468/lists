@@ -3,6 +3,7 @@ import oauth2 from '@fastify/oauth2';
 import jwt from '@fastify/jwt';
 import cookie from '@fastify/cookie';
 import { env } from '@repo/env';
+import { ApiError } from '@repo/common';
 
 export default fp(async (app) => {
   await app.register(cookie);
@@ -34,11 +35,11 @@ export default fp(async (app) => {
     },
   });
 
-  app.decorate('authenticate', async (req, res) => {
+  app.decorate('authenticate', async (req, _res) => {
     try {
       await req.jwtVerify();
-    } catch (err) {
-      res.send(err);
+    } catch {
+      throw new ApiError(401, 'UNAUTHORIZED', 'Not authenticated');
     }
   });
 });
