@@ -76,13 +76,14 @@ export const authModule: FastifyPluginAsyncZod = async (app) => {
         .returning();
 
       const payload = { id: user.id, email: user.email };
-      const jwtToken = app.jwt.sign(payload);
+      const jwtToken = app.jwt.sign(payload, { expiresIn: '7d' });
 
       res.setCookie('session', jwtToken, {
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7d
       });
 
       // Retrieve and clear the return_url cookie
