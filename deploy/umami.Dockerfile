@@ -1,9 +1,12 @@
 # deploy/umami.Dockerfile
 ARG NODE_IMAGE_VERSION="22-alpine"
+# Pinned: pnpm 11 fails on ignored dependency build scripts
+ARG PNPM_VERSION="10"
 
 FROM node:${NODE_IMAGE_VERSION} AS builder
+ARG PNPM_VERSION
 RUN apk add --no-cache git libc6-compat bash
-RUN npm install -g pnpm
+RUN npm install -g pnpm@${PNPM_VERSION}
 RUN git clone https://github.com/umami-software/umami.git /app
 WORKDIR /app
 
@@ -18,6 +21,7 @@ ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN pnpm run build-docker
 
 FROM node:${NODE_IMAGE_VERSION} AS runner
+ARG PNPM_VERSION
 WORKDIR /app
 
 ARG PRISMA_VERSION="6.19.0"
@@ -27,8 +31,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nextjs \
     && apk add --no-cache curl bash \
-    && npm install -g pnpm
-RUN pnpm --allow-build='@prisma/engines' add npm-run-all dotenv chalk semver \
+    && npm install -g pnpm@${PNPM_VERSION}
+RUN pnpm --allow-build='@prisma/engines' --allow-build=prisma add npm-run-all dotenv chalk semver \
     prisma@${PRISMA_VERSION} \
     @prisma/adapter-pg@${PRISMA_VERSION}
 
