@@ -58,6 +58,7 @@ export const useShoppingList = (listId?: string) => {
               isChecked: false,
               position: 9999,
               category: null,
+              possibleDuplicateOfId: null,
               createdAt: new Date(),
               updatedAt: new Date(),
             },

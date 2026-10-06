@@ -1,6 +1,16 @@
-import { User } from '@repo/common';
+import { ItemCategory, User } from '@repo/common';
 import { relations } from 'drizzle-orm';
-import { boolean, integer, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  type AnyPgColumn,
+  boolean,
+  integer,
+  pgTable,
+  primaryKey,
+  real,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-zod';
 
 // --- Users ---
@@ -25,6 +35,7 @@ export const shoppingLists = pgTable('shopping_lists', {
   name: text('name').notNull(),
   isTemplate: boolean('is_template').default(false).notNull(),
   isShared: boolean('is_shared').default(false).notNull(),
+  autoCategorize: boolean('auto_categorize').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -47,10 +58,14 @@ export const shoppingItems = pgTable('shopping_items', {
     .references(() => shoppingLists.id, { onDelete: 'cascade' })
     .notNull(),
   name: text('name').notNull(),
-  category: text('category'),
+  category: text('category').$type<ItemCategory>(),
   quantity: integer('quantity').default(1).notNull(),
   isChecked: boolean('is_checked').default(false).notNull(),
   position: integer('position').default(0).notNull(),
+  // Set by the item classifier when this looks like a synonym/typo of another item on the list.
+  possibleDuplicateOfId: uuid('possible_duplicate_of_id').references((): AnyPgColumn => shoppingItems.id, {
+    onDelete: 'set null',
+  }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -77,3 +92,12 @@ export const sharedListAccess = pgTable(
   },
   (table) => [primaryKey({ columns: [table.userId, table.listId] })],
 );
+
+// --- Item Category Cache ---
+// Global classifier cache keyed by normalized item name, so each name is classified once.
+export const itemCategories = pgTable('item_categories', {
+  normalizedName: text('normalized_name').primaryKey(),
+  category: text('category').$type<ItemCategory>().notNull(),
+  confidence: real('confidence'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
