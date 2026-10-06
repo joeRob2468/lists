@@ -45,12 +45,12 @@ export const ListDetail = () => {
   const getDuplicateOf = (item: (typeof items)[number]) =>
     items.find((other) => other.id === item.possibleDuplicateOfId);
 
+  // Stable sort keeps the user's manual order within each category.
+  const sortByCategory = (group: typeof items) =>
+    [...group].sort((a, b) => getItemCategoryRank(a.category) - getItemCategoryRank(b.category));
+
   const handleSortByCategory = () => {
-    // Stable sort keeps the user's manual order within each category.
-    const sortedActiveItems = [...activeItems].sort(
-      (a, b) => getItemCategoryRank(a.category) - getItemCategoryRank(b.category),
-    );
-    reorderItems([...sortedActiveItems, ...checkedItems]);
+    reorderItems([...sortByCategory(activeItems), ...sortByCategory(checkedItems)]);
   };
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -192,7 +192,7 @@ export const ListDetail = () => {
               <Button
                 variant="default"
                 leftSection={<IconArrowsSort size={18} />}
-                disabled={activeItems.length < 2}
+                disabled={items.length < 2}
                 onClick={handleSortByCategory}
               >
                 Sort by category
