@@ -4,6 +4,8 @@ import { JWT } from '@fastify/jwt';
 import * as schema from '@/db/schema';
 import type { WsServerEvent } from '@repo/common';
 import type { WebSocket } from '@fastify/websocket';
+import type { CategorizeItemInput, ClassifyItemInput, ClassifyItemResult } from '@/plugins/item-classifier';
+import type { ItemCategory } from '@repo/common';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
@@ -23,5 +25,7 @@ declare module 'fastify' {
     subscribeToList: (listId: string, socket: WebSocket) => void;
     unsubscribeFromList: (listId: string, socket: WebSocket) => void;
     broadcastToList: (listId: string, event: WsServerEvent['event']) => void;
+    categorizeItem: (input: CategorizeItemInput) => Promise<ItemCategory | null>;
+    classifyItem: (input: ClassifyItemInput) => Promise<ClassifyItemResult>;
   }
 }

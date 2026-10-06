@@ -12,6 +12,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     AUTH_SECRET: z.string().min(32),
     ALLOWED_ORIGINS: z.string().transform((s) => s.split(',')),
+    OPENROUTER_API_KEY: z.string().optional(),
   },
   clientPrefix: 'VITE_',
   client: {
@@ -28,6 +29,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     AUTH_SECRET: process.env.AUTH_SECRET,
     ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     VITE_API_URL: process.env.VITE_API_URL,
     VITE_UMAMI_WEBSITE_ID: process.env.VITE_UMAMI_WEBSITE_ID,
   },
