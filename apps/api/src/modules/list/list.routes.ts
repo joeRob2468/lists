@@ -2,21 +2,18 @@ import { sharedListAccess, shoppingItems, shoppingLists } from '@/db/schema';
 import {
   ApiError,
   ApiErrorResponseSchema,
-  CreateShoppingItemSchema,
   CreateShoppingListFromTemplateSchema,
   CreateShoppingListSchema,
-  ReorderShoppingItemsSchema,
   SaveListAsTemplateSchema,
-  ShoppingItemSchema,
   ShoppingListSchema,
   ShoppingListWithItemsSchema,
-  UpdateShoppingItemSchema,
   UpdateShoppingListSchema,
   WsClientMessageSchema,
 } from '@repo/common';
-import { and, asc, desc, eq, inArray, ne, or } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, ne } from 'drizzle-orm';
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { categorizeExistingItemsInBackground } from './item-classification';
 
 export const listModule: FastifyPluginAsyncZod = async (app) => {
   // --- List Endpoints ---
@@ -183,6 +180,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
           name: newName || template.name,
           ownerId: req.user.id,
           isTemplate: false,
+          autoCategorize: template.autoCategorize,
         })
         .returning();
 
@@ -240,6 +238,7 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
           name: newName || `${sourceList.name} Template`,
           ownerId: req.user.id,
           isTemplate: true,
+          autoCategorize: sourceList.autoCategorize,
         })
         .returning();
 
@@ -290,6 +289,9 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
       }
 
       app.broadcastToList(req.params.id, 'list_updated');
+      if (req.body.autoCategorize === true) {
+        void categorizeExistingItemsInBackground(app, updated.id, req.user.id);
+      }
       return updated;
     },
   });
@@ -341,191 +343,6 @@ export const listModule: FastifyPluginAsyncZod = async (app) => {
         throw new ApiError(404, 'NOT_FOUND', 'Access record not found.');
       }
 
-      res.status(204).send(null);
-    },
-  });
-
-  // --- Item Endpoints ---
-
-  app.route({
-    method: 'POST',
-    url: '/:id/items',
-    onRequest: [app.authenticate],
-    schema: {
-      tags: ['Items'],
-      params: z.object({ id: z.uuid() }),
-      body: CreateShoppingItemSchema,
-      response: {
-        201: ShoppingItemSchema,
-      },
-    },
-    handler: async (req, res) => {
-      const list = await app.db.query.shoppingLists.findFirst({
-        where: and(
-          eq(shoppingLists.id, req.params.id),
-          or(eq(shoppingLists.ownerId, req.user.id), eq(shoppingLists.isShared, true)),
-        ),
-      });
-
-      if (!list) {
-        throw new ApiError(404, 'NOT_FOUND', 'List not found');
-      }
-
-      const [maxPos] = await app.db
-        .select({ pos: shoppingItems.position })
-        .from(shoppingItems)
-        .where(eq(shoppingItems.listId, list.id))
-        .orderBy(desc(shoppingItems.position))
-        .limit(1);
-
-      const newPosition = (maxPos?.pos ?? -1) + 1;
-
-      const [item] = await app.db
-        .insert(shoppingItems)
-        .values({
-          ...req.body,
-          listId: list.id,
-          position: newPosition,
-        })
-        .returning();
-
-      await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, list.id));
-
-      app.broadcastToList(req.params.id, 'list_updated');
-      res.status(201);
-      return item;
-    },
-  });
-
-  app.route({
-    method: 'PATCH',
-    url: '/:id/items/:itemId',
-    onRequest: [app.authenticate],
-    schema: {
-      tags: ['Items'],
-      params: z.object({ id: z.uuid(), itemId: z.uuid() }),
-      body: UpdateShoppingItemSchema,
-      response: {
-        200: ShoppingItemSchema,
-      },
-    },
-    handler: async (req) => {
-      const [updated] = await app.db
-        .update(shoppingItems)
-        .set(req.body)
-        .where(
-          and(
-            eq(shoppingItems.id, req.params.itemId),
-            eq(shoppingItems.listId, req.params.id),
-            inArray(
-              shoppingItems.listId,
-              app.db
-                .select({ id: shoppingLists.id })
-                .from(shoppingLists)
-                .where(or(eq(shoppingLists.ownerId, req.user.id), eq(shoppingLists.isShared, true))),
-            ),
-          ),
-        )
-        .returning();
-
-      if (!updated) {
-        throw new ApiError(404, 'NOT_FOUND', 'Item or List not found');
-      }
-
-      await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, req.params.id));
-
-      app.broadcastToList(req.params.id, 'list_updated');
-      return updated;
-    },
-  });
-
-  app.route({
-    method: 'PATCH',
-    url: '/:id/items/reorder',
-    onRequest: [app.authenticate],
-    schema: {
-      tags: ['Items'],
-      summary: 'Reorder items',
-      params: z.object({ id: z.uuid() }),
-      body: ReorderShoppingItemsSchema,
-      response: {
-        200: z.array(ShoppingItemSchema),
-      },
-    },
-    handler: async (req) => {
-      const { itemIds } = req.body;
-      const listId = req.params.id;
-
-      const list = await app.db.query.shoppingLists.findFirst({
-        where: and(
-          eq(shoppingLists.id, listId),
-          or(eq(shoppingLists.ownerId, req.user.id), eq(shoppingLists.isShared, true)),
-        ),
-      });
-
-      if (!list) {
-        throw new ApiError(404, 'NOT_FOUND', 'List not found');
-      }
-
-      await app.db.transaction(async (tx) => {
-        await Promise.all(
-          itemIds.map((itemId, index) =>
-            tx
-              .update(shoppingItems)
-              .set({ position: index })
-              .where(and(eq(shoppingItems.id, itemId), eq(shoppingItems.listId, listId))),
-          ),
-        );
-      });
-
-      await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, list.id));
-
-      const updatedItems = await app.db.query.shoppingItems.findMany({
-        where: eq(shoppingItems.listId, listId),
-        orderBy: asc(shoppingItems.position),
-      });
-
-      app.broadcastToList(req.params.id, 'list_updated');
-      return updatedItems;
-    },
-  });
-
-  app.route({
-    method: 'DELETE',
-    url: '/:id/items/:itemId',
-    onRequest: [app.authenticate],
-    schema: {
-      tags: ['Items'],
-      params: z.object({ id: z.uuid(), itemId: z.uuid() }),
-      response: {
-        204: z.null(),
-      },
-    },
-    handler: async (req, res) => {
-      const result = await app.db
-        .delete(shoppingItems)
-        .where(
-          and(
-            eq(shoppingItems.id, req.params.itemId),
-            eq(shoppingItems.listId, req.params.id),
-            inArray(
-              shoppingItems.listId,
-              app.db
-                .select({ id: shoppingLists.id })
-                .from(shoppingLists)
-                .where(or(eq(shoppingLists.ownerId, req.user.id), eq(shoppingLists.isShared, true))),
-            ),
-          ),
-        )
-        .returning();
-
-      if (result.length === 0) {
-        throw new ApiError(404, 'NOT_FOUND', 'Item not found');
-      }
-
-      await app.db.update(shoppingLists).set({ updatedAt: new Date() }).where(eq(shoppingLists.id, req.params.id));
-
-      app.broadcastToList(req.params.id, 'list_updated');
       res.status(204).send(null);
     },
   });
