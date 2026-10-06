@@ -9,6 +9,14 @@ A simple, collaborative shopping list app. Create templates, share with family, 
 - Backend: Fastify, Drizzle ORM (Postgres), @fastify/websocket, Zod
 - Deployment: Docker, GitHub Actions (GHCR), Watchtower, Cloudflare Tunnels
 - Analytics: Umami
+- AI (optional): OpenRouter, using the TypeSafe Jev classifier for item categorization and duplicate hints
+
+## Item Categories & AI
+
+- Items can be categorized and sorted by category on any list. Categories are configured in one place: `packages/common/src/schemas/item-category.schemas.ts` (array order is the sort order).
+- Lists with **Auto-categorize** enabled use AI to categorize new items and suggest likely duplicates. Results are cached per item name (`item_categories` table), and calls are capped per user per day.
+- Adding an item with the same name as an existing one un-completes it or bumps its quantity instead of creating a duplicate.
+- The classifier backend is swappable: providers live in `apps/api/src/providers/item-classifier/`.
 
 ## Local Development
 
@@ -28,7 +36,7 @@ A simple, collaborative shopping list app. Create templates, share with family, 
    ```bash
    cp .env.example .env
    ```
-   Update the `.env` file with local database credentials and Google OAuth keys.
+   Update the `.env` file with local database credentials and Google OAuth keys. `OPENROUTER_API_KEY` is optional; AI features are disabled without it.
 3. Run database migrations:
    ```bash
    pnpm db:generate
@@ -98,7 +106,7 @@ Update the Google Cloud Console OAuth 2.0 Client ID with production URLs:
    ```bash
    cp .env.example .env
    ```
-3. Populate the `.env` file. Ensure `PROJECT_NAME`, `GITHUB_USERNAME` and `CLOUDFLARE_TUNNEL_TOKEN` are set.
+3. Populate the `.env` file. Ensure `PROJECT_NAME`, `GITHUB_USERNAME` and `CLOUDFLARE_TUNNEL_TOKEN` are set. Set `OPENROUTER_API_KEY` to enable AI item categorization.
 4. Authenticate Docker with GHCR using the PAT generated in Step 1:
    ```bash
    docker login ghcr.io -u <GITHUB_USERNAME>
