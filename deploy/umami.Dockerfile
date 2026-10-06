@@ -1,13 +1,16 @@
 # deploy/umami.Dockerfile
 ARG NODE_IMAGE_VERSION="22-alpine"
-# Pinned: pnpm 11 fails on ignored dependency build scripts
+# Pinned to the Umami commit production was last built from; newer versions need Prisma 7 and a different layout.
+ARG UMAMI_REF="b1e6c8f9ca70d499d6c1c22afc6d4c2821bf614c"
+# pnpm 11+ fails on ignored dependency build scripts
 ARG PNPM_VERSION="10"
 
 FROM node:${NODE_IMAGE_VERSION} AS builder
+ARG UMAMI_REF
 ARG PNPM_VERSION
 RUN apk add --no-cache git libc6-compat bash
 RUN npm install -g pnpm@${PNPM_VERSION}
-RUN git clone https://github.com/umami-software/umami.git /app
+RUN git clone https://github.com/umami-software/umami.git /app && git -C /app checkout ${UMAMI_REF}
 WORKDIR /app
 
 RUN pnpm install --frozen-lockfile
