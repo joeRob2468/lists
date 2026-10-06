@@ -111,10 +111,16 @@ Update the Google Cloud Console OAuth 2.0 Client ID with production URLs:
    ```bash
    docker login ghcr.io -u <GITHUB_USERNAME>
    ```
-5. Start the infrastructure from the root directory:
+5. Link the `.env` file into `deploy/` (Compose reads variables like `GITHUB_USERNAME` in `docker-compose.yml` from a `.env` next to it), then start the infrastructure:
    ```bash
    cd deploy
+   ln -s ../.env .env
    docker compose up -d
+   ```
+6. To update manually (Watchtower normally handles image updates), recreate the containers so `.env` changes are applied. `down` keeps the database volumes; never use `down -v`:
+   ```bash
+   git pull && cd deploy
+   docker compose down && docker compose pull && docker compose up -d
    ```
 
 **5. Continuous Deployment**
