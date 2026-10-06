@@ -2,12 +2,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "types": ["node"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
     "noEmit": false,
     "incremental": false,
+    "rootDir": "./src",
     "outDir": "./dist"
   },
   "include": ["src/**/*", "drizzle.config.js"]
