@@ -38,6 +38,7 @@
 
 .content {
   flex: 1;
+  min-width: 0;
   margin-left: var(--mantine-spacing-md);
   margin-right: var(--mantine-spacing-md);
 }
@@ -56,6 +57,14 @@
 
 .textInput {
   flex: 1;
+}
+
+.chips {
+  margin-right: var(--mantine-spacing-xs);
+}
+
+.duplicateHint {
+  margin-top: 2px;
 }
 
 .textInput input {

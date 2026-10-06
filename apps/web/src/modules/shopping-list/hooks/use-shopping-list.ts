@@ -1,10 +1,11 @@
 import { apiClient } from '@/api/client';
-import type {
-  CreateShoppingItemSchema,
-  ShoppingItemSchema,
-  ShoppingListWithItemsSchema,
-  UpdateShoppingItemSchema,
-  UpdateShoppingListSchema,
+import {
+  normalizeItemName,
+  type CreateShoppingItemSchema,
+  type ShoppingItemSchema,
+  type ShoppingListWithItemsSchema,
+  type UpdateShoppingItemSchema,
+  type UpdateShoppingListSchema,
 } from '@repo/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -46,6 +47,23 @@ export const useShoppingList = (listId?: string) => {
 
       queryClient.setQueryData<ShoppingListWithItems>(queryKey, (oldData) => {
         if (!oldData) return oldData;
+        const quantity = newItem.quantity ?? 1;
+
+        // Mirrors the server's dedupe: un-complete or bump the existing item.
+        const normalizedName = normalizeItemName(newItem.name);
+        const duplicate = oldData.items.find((item) => normalizeItemName(item.name) === normalizedName);
+        if (duplicate) {
+          const updated = duplicate.isChecked
+            ? { ...duplicate, isChecked: false, quantity }
+            : { ...duplicate, quantity: duplicate.quantity + quantity };
+          return {
+            ...oldData,
+            items: duplicate.isChecked
+              ? [...oldData.items.filter((item) => item.id !== duplicate.id), updated]
+              : oldData.items.map((item) => (item.id === duplicate.id ? updated : item)),
+          };
+        }
+
         return {
           ...oldData,
           items: [
@@ -54,10 +72,10 @@ export const useShoppingList = (listId?: string) => {
               id: crypto.randomUUID(),
               listId: listId!,
               name: newItem.name,
-              quantity: newItem.quantity ?? 1,
+              quantity,
               isChecked: false,
               position: 9999,
-              category: null,
+              category: newItem.category ?? null,
               possibleDuplicateOfId: null,
               createdAt: new Date(),
               updatedAt: new Date(),
@@ -159,6 +177,41 @@ export const useShoppingList = (listId?: string) => {
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
   });
 
+  const mergeItemMutation = useMutation({
+    mutationFn: async (itemId: string) => {
+      return apiClient.post(`lists/${listId}/items/${itemId}/merge`, { json: {} }).json<ShoppingItem>();
+    },
+    onMutate: async (itemId) => {
+      await queryClient.cancelQueries({ queryKey });
+
+      const previousList = queryClient.getQueryData<ShoppingListWithItems>(queryKey);
+
+      queryClient.setQueryData<ShoppingListWithItems>(queryKey, (oldData) => {
+        if (!oldData) return oldData;
+        const item = oldData.items.find((i) => i.id === itemId);
+        const target = oldData.items.find((i) => i.id === item?.possibleDuplicateOfId);
+        if (!item || !target) return oldData;
+
+        const mergedTarget = target.isChecked
+          ? { ...target, isChecked: false, quantity: item.quantity }
+          : { ...target, quantity: target.quantity + item.quantity };
+
+        return {
+          ...oldData,
+          items: oldData.items.filter((i) => i.id !== itemId).map((i) => (i.id === target.id ? mergedTarget : i)),
+        };
+      });
+
+      return { previousList };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousList) {
+        queryClient.setQueryData(queryKey, context.previousList);
+      }
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
   const reorderMutation = useMutation({
     mutationFn: async (newItems: ShoppingItem[]) => {
       const itemIds = newItems.map((item) => item.id);
@@ -225,6 +278,7 @@ export const useShoppingList = (listId?: string) => {
     toggleItem: toggleItemMutation.mutate,
     updateItem: updateItemMutation.mutate,
     deleteItem: deleteItemMutation.mutate,
+    mergeItem: mergeItemMutation.mutate,
     reorderItems: reorderMutation.mutate,
     updateList: updateListMutation.mutate,
     isUpdateListPending: updateListMutation.isPending,

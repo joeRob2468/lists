@@ -11,6 +11,9 @@ interface BaseShoppingItemsListProps {
   onToggle: (data: { itemId: string; isChecked: boolean }) => void;
   onUpdate: (data: { itemId: string; data: UpdateItemInput }) => void;
   onDelete: (itemId: string) => void;
+  onMerge?: (itemId: string) => void;
+  /** Resolves an item's `possibleDuplicateOfId` to the item it duplicates. */
+  getDuplicateOf?: (item: ShoppingItem) => ShoppingItem | undefined;
   renderHeader?: () => React.ReactNode;
   renderFooter?: () => React.ReactNode;
 }
@@ -36,6 +39,8 @@ export const ShoppingItemsList = ({
   onToggle,
   onUpdate,
   onDelete,
+  onMerge,
+  getDuplicateOf,
   onReorder,
   renderHeader,
   renderFooter,
@@ -67,9 +72,11 @@ export const ShoppingItemsList = ({
                 draggableProps={provided.draggableProps}
                 dragHandleProps={provided.dragHandleProps}
                 isDragging={snapshot.isDragging}
+                duplicateOf={getDuplicateOf?.(item)}
                 onToggle={(itemId, isChecked) => onToggle({ itemId, isChecked })}
                 onUpdate={(itemId, data) => onUpdate({ itemId, data })}
                 onDelete={(itemId) => onDelete(itemId)}
+                onMerge={onMerge}
               />
             )}
           </Draggable>
@@ -77,9 +84,11 @@ export const ShoppingItemsList = ({
           <ShoppingItemRow
             key={item.id}
             item={item}
+            duplicateOf={getDuplicateOf?.(item)}
             onToggle={(itemId, isChecked) => onToggle({ itemId, isChecked })}
             onUpdate={(itemId, data) => onUpdate({ itemId, data })}
             onDelete={onDelete}
+            onMerge={onMerge}
           />
         ),
       )}

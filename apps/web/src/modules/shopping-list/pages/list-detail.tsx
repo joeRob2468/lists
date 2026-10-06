@@ -5,13 +5,16 @@ import { useUser } from '@/modules/auth/hooks/use-user';
 import { Badge, Button, Container, Group, Skeleton, Stack, Text, Textarea, Title } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { IconCopy, IconShare, IconTemplate, IconTrash, IconUsers } from '@tabler/icons-react';
+import { getItemCategoryRank } from '@repo/common';
+import { IconArrowsSort, IconSparkles, IconTemplate, IconTrash, IconUsers } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ShoppingItemAddForm } from '../components/shopping-item-add-form/shopping-item-add-form';
 import { ShoppingItemsList } from '../components/shopping-items-list/shopping-items-list';
+import { ShoppingListActionsMenu } from '../components/shopping-list-actions-menu/shopping-list-actions-menu';
 import { ShoppingListCreateModal } from '../components/shopping-list-create-modal/shopping-list-create-modal';
 import { ShareListModal } from '../components/shopping-list-share-modal/shopping-list-share-modal';
+import { useItemHistoryQuery } from '../hooks/use-item-history-query';
 import { useShoppingList } from '../hooks/use-shopping-list';
 import { useShoppingListMutations } from '../hooks/use-shopping-list-mutations';
 
@@ -29,15 +32,26 @@ export const ListDetail = () => {
     toggleItem,
     updateItem,
     deleteItem,
+    mergeItem,
     reorderItems,
     updateList,
-    isPending,
     isUpdateListPending,
   } = useShoppingList(listId);
   const { deleteList, isDeletePending } = useShoppingListMutations();
+  const { history } = useItemHistoryQuery();
 
   const activeItems = items.filter((item) => !item.isChecked);
   const checkedItems = items.filter((item) => item.isChecked);
+  const getDuplicateOf = (item: (typeof items)[number]) =>
+    items.find((other) => other.id === item.possibleDuplicateOfId);
+
+  const handleSortByCategory = () => {
+    // Stable sort keeps the user's manual order within each category.
+    const sortedActiveItems = [...activeItems].sort(
+      (a, b) => getItemCategoryRank(a.category) - getItemCategoryRank(b.category),
+    );
+    reorderItems([...sortedActiveItems, ...checkedItems]);
+  };
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
@@ -166,28 +180,35 @@ export const ListDetail = () => {
                   Template
                 </Badge>
               )}
+              {list.autoCategorize && (
+                <Badge variant="light" color="violet" leftSection={<IconSparkles size={12} />}>
+                  Auto-categorize
+                </Badge>
+              )}
             </Group>
           }
           actions={
-            <Group>
-              <Button variant="default" leftSection={<IconCopy size={18} />} onClick={() => setTemplateModalOpen(true)}>
-                {list.isTemplate ? 'Create List' : 'Save as Template'}
+            <Group gap="xs">
+              <Button
+                variant="default"
+                leftSection={<IconArrowsSort size={18} />}
+                disabled={activeItems.length < 2}
+                onClick={handleSortByCategory}
+              >
+                Sort by category
               </Button>
-              {isOwner && (
-                <>
-                  <Button leftSection={<IconShare size={18} />} onClick={() => setShareModalOpen(true)}>
-                    Share
-                  </Button>
-                  <Button
-                    leftSection={<IconTrash size={18} />}
-                    disabled={isDeletePending}
-                    onClick={handleDelete}
-                    color="red"
-                  >
-                    Delete
-                  </Button>
-                </>
-              )}
+              <ShoppingListActionsMenu
+                isOwner={isOwner}
+                isTemplate={list.isTemplate}
+                autoCategorize={list.autoCategorize}
+                isDeletePending={isDeletePending}
+                onToggleAutoCategorize={() =>
+                  updateList({ listId: list.id, data: { autoCategorize: !list.autoCategorize } })
+                }
+                onShare={() => setShareModalOpen(true)}
+                onTemplate={() => setTemplateModalOpen(true)}
+                onDelete={handleDelete}
+              />
             </Group>
           }
         />
@@ -198,6 +219,8 @@ export const ListDetail = () => {
           onToggle={toggleItem}
           onUpdate={updateItem}
           onDelete={deleteItem}
+          onMerge={mergeItem}
+          getDuplicateOf={list.autoCategorize ? getDuplicateOf : undefined}
           onReorder={(newActiveItems) => {
             const newItems = [...newActiveItems, ...checkedItems];
             reorderItems(newItems);
@@ -205,7 +228,8 @@ export const ListDetail = () => {
         />
         <ShoppingItemAddForm
           onAdd={(values) => addItem(values)}
-          isLoading={isPending}
+          items={items}
+          history={history}
           hideTopBorder={activeItems.length > 0}
         />
 

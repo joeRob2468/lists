@@ -1,9 +1,11 @@
 import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
-import { ActionIcon, Badge, Checkbox, Group, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Checkbox, Group, Text, TextInput } from '@mantine/core';
 import type { ShoppingItemSchema, UpdateShoppingItemSchema } from '@repo/common';
-import { IconGripVertical, IconTrash } from '@tabler/icons-react';
+import { IconGripVertical, IconSparkles, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import type z from 'zod';
+import { ShoppingItemCategoryChip } from '../shopping-item-category-chip/shopping-item-category-chip';
+import { ShoppingItemQuantityChip } from '../shopping-item-quantity-chip/shopping-item-quantity-chip';
 import classes from './shopping-item-row.module.css';
 
 type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
@@ -14,6 +16,9 @@ interface ShoppingItemRowProps {
   onToggle: (id: string, isChecked: boolean) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, data: UpdateItemInput) => void;
+  /** Item this one was flagged as a likely duplicate of. */
+  duplicateOf?: ShoppingItem;
+  onMerge?: (id: string) => void;
   isPending?: boolean;
   draggableProps?: DraggableProvidedDraggableProps;
   dragHandleProps?: DraggableProvidedDragHandleProps | null;
@@ -26,6 +31,8 @@ export const ShoppingItemRow = ({
   onToggle,
   onDelete,
   onUpdate,
+  duplicateOf,
+  onMerge,
   isPending,
   dragHandleProps,
   draggableProps,
@@ -68,28 +75,47 @@ export const ShoppingItemRow = ({
         size="md"
       />
       <div className={classes.content}>
-        <Group gap="xs">
-          <TextInput
-            variant="unstyled"
-            value={nameValue}
-            onChange={(e) => setNameValue(e.currentTarget.value)}
-            onBlur={handleSubmit}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
-            className={`${classes.textInput} ${item.isChecked ? classes.strikethrough : undefined}`}
-            fw={500}
-          />
-          {item.quantity > 1 && (
-            <Badge variant="light" color="gray" size="sm">
-              x{item.quantity}
-            </Badge>
-          )}
-        </Group>
+        <TextInput
+          variant="unstyled"
+          value={nameValue}
+          onChange={(e) => setNameValue(e.currentTarget.value)}
+          onBlur={handleSubmit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
+          className={`${classes.textInput} ${item.isChecked ? classes.strikethrough : undefined}`}
+          fw={500}
+        />
+        {duplicateOf && !item.isChecked && (
+          <Group gap={4} className={classes.duplicateHint}>
+            <IconSparkles size={12} color="var(--mantine-color-violet-4)" />
+            <Text size="xs" c="violet.3">
+              Same as "{duplicateOf.name}"?
+            </Text>
+            {onMerge && (
+              <Button size="compact-xs" variant="subtle" color="violet" onClick={() => onMerge(item.id)}>
+                Merge
+              </Button>
+            )}
+            <Button
+              size="compact-xs"
+              variant="subtle"
+              color="gray"
+              onClick={() => onUpdate(item.id, { possibleDuplicateOfId: null })}
+            >
+              Keep both
+            </Button>
+          </Group>
+        )}
       </div>
+
+      <Group gap={6} wrap="nowrap" className={classes.chips}>
+        <ShoppingItemCategoryChip category={item.category} onChange={(category) => onUpdate(item.id, { category })} />
+        <ShoppingItemQuantityChip quantity={item.quantity} onChange={(quantity) => onUpdate(item.id, { quantity })} />
+      </Group>
 
       <ActionIcon
         className={classes.deleteButton}
