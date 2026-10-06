@@ -27,7 +27,8 @@ FROM node:${NODE_IMAGE_VERSION} AS runner
 ARG PNPM_VERSION
 WORKDIR /app
 
-ARG PRISMA_VERSION="6.19.0"
+# Must match the Prisma version in Umami's package.json at UMAMI_REF
+ARG PRISMA_VERSION="7.3.0"
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -35,12 +36,16 @@ RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nextjs \
     && apk add --no-cache curl bash \
     && npm install -g pnpm@${PNPM_VERSION}
-RUN pnpm --allow-build='@prisma/engines' --allow-build=prisma add npm-run-all dotenv chalk semver \
+# Exact versions: Umami's standalone output (copied below) links semver@7.7.4 from its lockfile, so a different
+# version here leaves node_modules/semver pointing at an incomplete copy.
+RUN pnpm --allow-build='@prisma/engines' --allow-build=prisma add npm-run-all@4.1.5 dotenv@18.0.5 chalk@6.0.1 semver@7.7.4 \
     prisma@${PRISMA_VERSION} \
+    @prisma/client@${PRISMA_VERSION} \
     @prisma/adapter-pg@${PRISMA_VERSION}
 
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=nextjs:nodejs /app/generated ./generated
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
