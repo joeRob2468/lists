@@ -14,7 +14,7 @@ A simple, collaborative shopping list app. Create templates, share with family, 
 ## Item Categories & AI
 
 - Items can be categorized and sorted by category on any list. Categories are configured in one place: `packages/common/src/schemas/item-category.schemas.ts` (array order is the sort order).
-- Lists with **Auto-categorize** enabled use AI to categorize new items and suggest likely duplicates. Results are cached per item name (`item_categories` table), and calls are capped per user per day.
+- Lists with **Auto-categorize** enabled use AI to categorize new items and suggest likely duplicates. Results are cached per item name (`item_categories` table). Calls are capped per user and overall per day, each call's token usage is logged (`Item classification usage`), and calls pause for 10 minutes after an invalid key or out-of-credits error.
 - Adding an item with the same name as an existing one un-completes it or bumps its quantity instead of creating a duplicate.
 - The classifier backend is swappable: providers live in `apps/api/src/providers/item-classifier/`.
 

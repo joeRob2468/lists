@@ -1,5 +1,9 @@
 import { itemCategories } from '@/db/schema';
-import type { ItemClassifierProvider } from '@/providers/item-classifier/item-classifier.provider';
+import {
+  type ItemClassifierProvider,
+  type ItemClassifierUsage,
+  ItemClassifierUnavailableError,
+} from '@/providers/item-classifier/item-classifier.provider';
 import { createJevProvider } from '@/providers/item-classifier/jev.provider';
 import { type ItemCategory, ItemCategorySchema, isLikelyTypo, normalizeItemName } from '@repo/common';
 import { env } from '@repo/env';
@@ -13,6 +17,9 @@ const MIN_CATEGORY_CONFIDENCE = 0.5;
 const MIN_DUPLICATE_CONFIDENCE = 0.8;
 const MAX_DUPLICATE_CANDIDATES = 20;
 const MAX_CALLS_PER_USER_PER_DAY = 200;
+const MAX_CALLS_PER_DAY = 2000;
+// Pause after account-level failures (invalid key, out of credits) instead of retrying on every add.
+const UNAVAILABLE_PAUSE_MS = 10 * 60 * 1000;
 
 export interface CategorizeItemInput {
   userId: string;
@@ -46,31 +53,48 @@ export default fp(async (app) => {
     app.log.warn('OPENROUTER_API_KEY not set - item classification limited to cache and local typo checks');
   }
 
-  // In-memory daily cap per user; resets on restart, which is fine for a cost guard.
+  // In-memory daily caps; reset on restart, which is fine for a cost guard.
   let usageDay = '';
+  let callsToday = 0;
   const callsByUser = new Map<string, number>();
+  let pausedUntil = 0;
 
   const reserveCall = (userId: string) => {
     const today = new Date().toISOString().slice(0, 10);
     if (today !== usageDay) {
       usageDay = today;
+      callsToday = 0;
       callsByUser.clear();
     }
-    const calls = callsByUser.get(userId) ?? 0;
-    if (calls >= MAX_CALLS_PER_USER_PER_DAY) {
-      app.log.warn({ userId }, 'Daily item classification cap reached');
+    const userCalls = callsByUser.get(userId) ?? 0;
+    if (userCalls >= MAX_CALLS_PER_USER_PER_DAY || callsToday >= MAX_CALLS_PER_DAY) {
+      app.log.warn({ userId, userCalls, callsToday }, 'Daily item classification cap reached');
       return false;
     }
-    callsByUser.set(userId, calls + 1);
+    callsByUser.set(userId, userCalls + 1);
+    callsToday += 1;
     return true;
   };
 
-  const callProvider = async <T>(userId: string, call: (provider: ItemClassifierProvider) => Promise<T>) => {
-    if (!provider || !reserveCall(userId)) return null;
+  const callProvider = async <T extends { usage?: ItemClassifierUsage } | null>(
+    userId: string,
+    kind: 'categorize' | 'duplicate',
+    call: (provider: ItemClassifierProvider) => Promise<T>,
+  ) => {
+    if (!provider || Date.now() < pausedUntil || !reserveCall(userId)) return null;
     try {
-      return await call(provider);
+      const result = await call(provider);
+      if (result?.usage) {
+        app.log.info({ userId, kind, ...result.usage }, 'Item classification usage');
+      }
+      return result;
     } catch (err) {
-      app.log.error(err, 'Item classification request failed');
+      if (err instanceof ItemClassifierUnavailableError) {
+        pausedUntil = Date.now() + UNAVAILABLE_PAUSE_MS;
+        app.log.error(err, 'Item classification unavailable, pausing calls');
+      } else {
+        app.log.error(err, 'Item classification request failed');
+      }
       return null;
     }
   };
@@ -83,7 +107,7 @@ export default fp(async (app) => {
     if (cached) return cached.category;
     if (cacheOnly) return null;
 
-    const answer = await callProvider(userId, (p) => p.categorize(name, timeoutMs));
+    const answer = await callProvider(userId, 'categorize', (p) => p.categorize(name, timeoutMs));
     if (!answer) return null;
 
     // Unsure answers are cached as "other" too, so a name is never asked twice.
@@ -112,7 +136,7 @@ export default fp(async (app) => {
     if (typo) return { category, possibleDuplicateOfId: typo.id };
 
     const checked = related.slice(0, MAX_DUPLICATE_CANDIDATES);
-    const answer = await callProvider(userId, (p) =>
+    const answer = await callProvider(userId, 'duplicate', (p) =>
       p.findDuplicate(
         name,
         checked.map((candidate) => candidate.name),
