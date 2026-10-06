@@ -69,7 +69,7 @@ Uses `buildx` for cross-platform compatibility.
 
 ### Automatic Deploy (CI/CD)
 
-Pushing to the `production` branch triggers parallel builds in GitHub Actions.
+Pushing to the `production` branch triggers parallel builds in GitHub Actions. The API and web images build on every push; the Umami image builds only when `deploy/umami.Dockerfile` changes (or via a manual run of its workflow).
 
 1. Images are pushed to GHCR.
 2. Server-side Watchtower detects new :latest tags.
