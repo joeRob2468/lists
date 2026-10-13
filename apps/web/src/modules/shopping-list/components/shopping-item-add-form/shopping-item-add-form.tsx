@@ -3,7 +3,7 @@ import { Autocomplete, Badge, Group, Text } from '@mantine/core';
 import {
   CreateShoppingItemSchema,
   ITEM_CATEGORY_COLORS,
-  ITEM_CATEGORY_LABELS,
+  ITEM_CATEGORY_SHORT_LABELS,
   type ItemHistoryEntrySchema,
   type ShoppingItemSchema,
 } from '@repo/common';
@@ -107,7 +107,7 @@ export const ShoppingItemAddForm = ({
                   <Group gap={6} wrap="nowrap">
                     {category && (
                       <Badge variant="light" color={ITEM_CATEGORY_COLORS[category]} size="xs">
-                        {ITEM_CATEGORY_LABELS[category]}
+                        {ITEM_CATEGORY_SHORT_LABELS[category]}
                       </Badge>
                     )}
                     {item && (item.isChecked || item.quantity > 1) && (

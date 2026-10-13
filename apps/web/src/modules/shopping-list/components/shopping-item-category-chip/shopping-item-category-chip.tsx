@@ -1,5 +1,11 @@
 import { Badge, ColorSwatch, Menu } from '@mantine/core';
-import { ITEM_CATEGORY_COLORS, ITEM_CATEGORY_LABELS, type ItemCategory, ItemCategorySchema } from '@repo/common';
+import {
+  ITEM_CATEGORY_COLORS,
+  ITEM_CATEGORY_LABELS,
+  ITEM_CATEGORY_SHORT_LABELS,
+  type ItemCategory,
+  ItemCategorySchema,
+} from '@repo/common';
 import { IconCheck } from '@tabler/icons-react';
 
 interface ShoppingItemCategoryChipProps {
@@ -21,9 +27,10 @@ export const ShoppingItemCategoryChip = ({ category, onChange }: ShoppingItemCat
           color={ITEM_CATEGORY_COLORS[displayed]}
           size="sm"
           style={{ cursor: 'pointer' }}
-          aria-label="Change category"
+          title={ITEM_CATEGORY_LABELS[displayed]}
+          aria-label={`Change category (${ITEM_CATEGORY_LABELS[displayed]})`}
         >
-          {ITEM_CATEGORY_LABELS[displayed]}
+          {ITEM_CATEGORY_SHORT_LABELS[displayed]}
         </Badge>
       </Menu.Target>
       <Menu.Dropdown mah={320} style={{ overflowY: 'auto' }}>
