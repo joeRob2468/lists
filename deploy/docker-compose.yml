@@ -71,7 +71,8 @@ services:
       - ../.env
 
   watchtower:
-    image: containrrr/watchtower
+    # Maintained fork: containrrr/watchtower is abandoned and Docker 29+ refuses its old API version
+    image: nickfedor/watchtower
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
